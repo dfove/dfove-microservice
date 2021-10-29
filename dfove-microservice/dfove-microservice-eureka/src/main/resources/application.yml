@@ -1,0 +1,24 @@
+server: 
+  port: 8500
+#  address: 172.16.0.2
+spring: #  可以把数据发送到后面算子的所有并行实际例中进行计算，否则处理数据丢失数据
+
+  application: 
+    name: dfove-microservice-eureka
+    
+eureka:
+  server: 
+    enable-self-preservation: false #自我保护
+  environment: dev
+  instance: 
+    hostname: localhost
+    preferIpAddress: false
+  client:
+    # 由于该应用为注册中心,所以设置为false，代表不向注册中心注册自己
+    register-with-eureka: false
+    # 由于注册中心的职责就是维护服务实例，它并不需要去检索服务,所以也设置为false
+    fetch-registry: false
+    serviceUrl:
+      # 如果服务注册中心为高可用集群时，多个注册中心地址以逗号分隔
+      # 如果服务注册中心加入了安全验证，这里配置的地址格式为： http://<username>:<password>@localhost:8761/eureka
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/

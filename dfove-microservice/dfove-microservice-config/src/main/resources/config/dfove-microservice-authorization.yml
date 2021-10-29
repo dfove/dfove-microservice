@@ -1,0 +1,67 @@
+﻿#begin
+
+#服务注册
+eureka:
+  client: 
+    healthcheck: 
+      enabled: true
+#临时文件
+server:
+  tomcat:
+    basedir: /data/run/jnyc-microservice/temp
+      
+
+
+
+#customized
+jwt: 
+  issuer: jnyc
+  secretKey: Hjhdsd$%^fgsdk998343uj7^%043043
+  anonymous: jnyc-anonymous
+  password: jnyc-anonymous-8934snKkdjhfdshdbsh
+  expiration: 15552000
+
+  
+  
+
+
+#内部服务
+microservices: 
+  restTimeout: 20000
+  map: 
+    gateway: 
+      gateway: http://localhost:8800
+      intranet: http://localhost:8800
+      eureka: http://dfove-microservice-gateway
+    admin: 
+      gateway: /dfove/api/v1
+      intranet: http://localhost:60001/dfove/v1
+      eureka: http://dfove-admin/dfove/v1
+      
+#网关
+gateways:
+  map: 
+    adminOpen: #白名单设置 匹配
+    - url: /dfove/v(\d+)(/\w*)*
+      methods: get;post;put;delete
+    - url: /dfove/v1/menu/admin
+      methods: put;get
+    - url: /dfove/v1/apis/redis
+      methods: delete
+    - url: /dfove/v1/admin(/\d+)?$
+      methods: get;post
+    - url: /dfove/v1/login/refresh
+      methods: post;get
+    - url: /dfove/v1/login/quit
+      methods: get
+    - url: /endpoint(/\d+)?(/)?$
+      methods: get
+    - url: /dfove/v1/permission/redis
+      methods: delete
+    - url: /dfove/v1/(case|express|retail|jargon)\w*(/\w*)*
+      methods: post;get
+    - url: /dfove/v1(/\w*){1,3}/personal$
+      methods: post;get
+    - url: /dfove/v1/monitor/restart/all
+      methods: get
+#end  

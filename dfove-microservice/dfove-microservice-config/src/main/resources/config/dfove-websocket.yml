@@ -1,0 +1,39 @@
+#begin
+
+#服务注册
+eureka:
+  client: 
+    healthcheck: 
+      enabled: true
+
+#customized
+redis: 
+  host: 127.16.0.1
+  port: 6379
+  password: zgr888
+   
+mq: 
+  host: 127.16.0.1
+  userName: jnyc
+  password: zgr888
+
+microservices: 
+  restTimeout: 20000
+  map: 
+    gateway: 
+      gateway: http://127.16.0.1:8800
+      intranet: http://127.16.0.1:8800
+      eureka: http://dfove-microservice-gateway
+    authorization: 
+      gateway: /authorization
+      intranet: http://127.16.0.1:8700
+      eureka: http://dfove-microservice-authorization
+    log:
+      gateway: /log
+      intranet: http://localhost:10131
+      eureka: http://dfove-log
+#swagger
+swagger:
+  enable: false
+      
+#end  

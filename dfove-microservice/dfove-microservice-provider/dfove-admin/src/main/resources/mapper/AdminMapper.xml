@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.admin.mapper.AdminMapper" >
+  <resultMap id="BaseResultMap" type="com.microservice.admin.entity.Admin">
+        <id column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+        <result column="PASSWORD" property="password" jdbcType="VARCHAR" />
+        <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+        <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="INTEGER" />
+        <result column="CREATE_ADMIN_ID" property="createAdminId" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="GENDER" property="gender" jdbcType="INTEGER" />
+        <result column="ADMIN_LOGO" property="adminLogo" jdbcType="VARCHAR" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="GRADE" property="grade" jdbcType="INTEGER" />
+<!--        <collection property="adminRoles" ofType="com.microservice.admin.entity.AdminRole" >-->
+<!--        <id column="ADMIN_ROLE_ID" property="adminRoleId" jdbcType="BIGINT" />-->
+<!--        &lt;!&ndash; <result column="ADMIN_ID" property="adminId" jdbcType="BIGINT" /> &ndash;&gt;-->
+<!--        <result column="ROLE_ID" property="roleId" jdbcType="BIGINT" />-->
+<!--        </collection>-->
+        
+  </resultMap>
+  
+  <resultMap id="BaseResultAdminMap" type="com.microservice.admin.entity.Admin">
+         <id column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+  </resultMap>  
+  
+  <sql id="Base_Column_List" >
+     ADMIN_ID, ADMIN_NAME, REAL_NAME, PASSWORD, EMAIL, PHONE, STATUS, CREATE_ADMIN_ID, ORGANIZATION_ID, ORGANIZATION_NAME, CREATE_TIME, UPDATE_TIME, GENDER, ADMIN_LOGO, REMARK, GRADE
+  </sql>
+  <sql id="Base_Column_List_Page" >
+     a1.ADMIN_ID,  a1.ADMIN_NAME,  a1.REAL_NAME,  a1.PASSWORD,  a1.EMAIL,  a1.PHONE,  a1.STATUS,  a1.CREATE_ADMIN_ID,  a1.ORGANIZATION_ID,  a1.ORGANIZATION_NAME,  a1.CREATE_TIME,  a1.UPDATE_TIME,  a1.GENDER, a1.ADMIN_LOGO,  a1.REMARK,  a1.GRADE
+  	,b.ADMIN_ROLE_ID, b.ROLE_ID
+  </sql>
+  <sql id="Base_Column_List_Page_Top" >
+     ADMIN_ID, ADMIN_NAME, REAL_NAME, PASSWORD, EMAIL, PHONE, STATUS, CREATE_ADMIN_ID, ORGANIZATION_ID, ORGANIZATION_NAME, CREATE_TIME, UPDATE_TIME, GENDER, ADMIN_LOGO, REMARK, GRADE
+  	,ADMIN_ROLE_ID, ROLE_ID
+  </sql>
+  
+  
+  <select id="find" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_ADMIN
+    where ADMIN_ID = #{id,jdbcType=VARCHAR}
+  </select>
+  
+ <select id="findByAdminName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_ADMIN
+    where (
+    	ADMIN_NAME = #{adminName,jdbcType=VARCHAR}
+    	or PHONE=#{adminName,jdbcType=VARCHAR}
+    	or EMAIL=#{adminName,jdbcType=VARCHAR}
+    	
+    	or ADMIN_NAME = #{phone,jdbcType=VARCHAR}
+    	or PHONE=#{phone,jdbcType=VARCHAR}
+    	or EMAIL=#{phone,jdbcType=VARCHAR}
+    	
+    	or ADMIN_NAME = #{email,jdbcType=VARCHAR}
+    	or PHONE=#{email,jdbcType=VARCHAR}
+    	or EMAIL=#{email,jdbcType=VARCHAR}
+    	
+    	)
+    	and rownum &lt; =1 order by rownum asc
+  </select>
+ <select id="findVerification" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_ADMIN
+    where (
+    	ADMIN_NAME = #{adminName,jdbcType=VARCHAR}
+    	or PHONE=#{adminName,jdbcType=VARCHAR}
+    	or EMAIL=#{adminName,jdbcType=VARCHAR}
+    	
+    	or ADMIN_NAME = #{phone,jdbcType=VARCHAR}
+    	or PHONE=#{phone,jdbcType=VARCHAR}
+    	or EMAIL=#{phone,jdbcType=VARCHAR}
+    	
+    	or ADMIN_NAME = #{email,jdbcType=VARCHAR}
+    	or PHONE=#{email,jdbcType=VARCHAR}
+    	or EMAIL=#{email,jdbcType=VARCHAR}
+    	
+    	)
+    	and rownum &lt; =1 order by rownum asc
+  </select>
+
+	<select id="findByOrgType" resultType="java.lang.Long" parameterType="java.lang.String">
+		SELECT a.ADMIN_ID
+		FROM tb_admin a, tb_organization b
+		WHERE a.organization_id = b.organization_id
+		and b.org_type=#{orgType,jdbcType=VARCHAR}
+	</select>
+  
+  <select id="findOthers" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TB_ADMIN
+    where ADMIN_ID != #{adminId,jdbcType=VARCHAR}
+
+      <if test='name != null and name != ""'>
+          and (
+          ADMIN_NAME=#{name,jdbcType=VARCHAR}
+          <if test='phone != null and phone!=""'>
+              or ((ADMIN_NAME=#{phone,jdbcType=VARCHAR} or PHONE=#{phone,jdbcType=VARCHAR} or
+              EMAIL=#{phone,jdbcType=VARCHAR})
+              <if test='email != null and email!=""'>
+                  or (ADMIN_NAME=#{email,jdbcType=VARCHAR} or PHONE=#{email,jdbcType=VARCHAR} or
+                  EMAIL=#{email,jdbcType=VARCHAR})
+              </if>)
+          </if>
+          <if test='phone == null or phone==""'>
+              <if test='email != null and email!=""'>
+                  or (ADMIN_NAME=#{email,jdbcType=VARCHAR} or PHONE=#{email,jdbcType=VARCHAR} or
+                  EMAIL=#{email,jdbcType=VARCHAR})
+              </if>
+          </if>
+          )
+      </if>
+      <if test='name == null and name == ""'>
+    <if test='phone != null and phone!=""'>
+        and ((ADMIN_NAME=#{phone,jdbcType=VARCHAR} or PHONE=#{phone,jdbcType=VARCHAR} or EMAIL=#{phone,jdbcType=VARCHAR})
+	    <if test='email != null and email!=""'>
+	        or (ADMIN_NAME=#{email,jdbcType=VARCHAR} or PHONE=#{email,jdbcType=VARCHAR} or EMAIL=#{email,jdbcType=VARCHAR})
+	    </if>)
+    </if>
+    <if test='phone == null or phone==""'>
+	    <if test='email != null and email!=""'>
+	        and (ADMIN_NAME=#{email,jdbcType=VARCHAR} or PHONE=#{email,jdbcType=VARCHAR} or EMAIL=#{email,jdbcType=VARCHAR})
+	    </if>
+    </if>
+      </if>
+    and rownum &lt; =1
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from TB_ADMIN
+    where ADMIN_ID = #{adminId,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="add" parameterType="com.microservice.admin.entity.Admin">
+    insert into TB_ADMIN
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="adminId != null">
+        ADMIN_ID,
+        </if>
+        <if test="adminName != null">
+        ADMIN_NAME,
+        </if>
+        <if test='realName != null and realName !="" '>
+        REAL_NAME,
+        </if>
+        <if test="password != null">
+        PASSWORD,
+        </if>
+        <if test='email != null and email !=""'>
+        EMAIL,
+        </if>
+        <if test='phone != null '>
+        PHONE,
+        </if>
+        <if test='status != null '>
+        STATUS,
+        </if>
+        <if test='createAdminId != null '>
+        CREATE_ADMIN_ID,
+        </if>
+        <if test='organizationId != null '>
+        ORGANIZATION_ID,
+        </if>
+        <if test='organizationName != null and organizationName !=""'>
+        ORGANIZATION_NAME,
+        </if>
+        CREATE_TIME,
+        UPDATE_TIME,
+        <if test='gender != null and gender !=""'>
+        GENDER,
+        </if>
+        <if test='adminLogo != null and adminLogo !=""'>
+        ADMIN_LOGO,
+        </if>
+        <if test='remark != null and remark !=""'>
+        REMARK,
+        </if>
+        <if test='grade != null and grade !=""'>
+        GRADE,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+    	<if test="adminId != null">
+        #{adminId,jdbcType=VARCHAR},
+        </if>
+        <if test="adminName != null">
+        #{adminName,jdbcType=VARCHAR},
+        </if>
+        <if test='realName != null and realName !="" '>
+        #{realName,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+        </if>
+        <if test='email != null and email !=""'>
+        #{email,jdbcType=VARCHAR},
+        </if>
+        <if test='phone != null '>
+        #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test='status != null '>
+        #{status,jdbcType=INTEGER},
+        </if>
+        <if test='createAdminId != null '>
+        #{createAdminId,jdbcType=BIGINT},
+        </if>
+         <if test='organizationId != null '>
+        #{organizationId,jdbcType=INTEGER},
+        </if>
+        <if test='organizationName != null and organizationName !=""'>
+        #{organizationName,jdbcType=VARCHAR},
+        </if>
+        sysdate,
+        sysdate,
+        <if test='gender != null and gender !=""'>
+        #{gender,jdbcType=INTEGER},
+        </if>
+        <if test='adminLogo != null and adminLogo !=""'>
+        #{adminLogo,jdbcType=VARCHAR},
+        </if>
+        <if test='remark != null and remark !=""'>
+        #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test='grade != null and grade !=""'>
+        #{grade,jdbcType=INTEGER},
+        </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.microservice.admin.entity.Admin">
+    update TB_ADMIN 
+    <set>
+        <if test="adminName != null">
+        ADMIN_NAME = #{adminName,jdbcType=VARCHAR},
+        </if>
+        <if test="realName != null">
+        REAL_NAME = #{realName,jdbcType=VARCHAR},
+        </if>
+        <if test="email != null">
+        EMAIL = #{email,jdbcType=VARCHAR},
+        </if>
+        <if test="phone != null">
+        PHONE = #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test="createAdminId != null">
+        CREATE_ADMIN_ID = #{createAdminId,jdbcType=BIGINT},
+        </if>
+        <if test="organizationId != null">
+        ORGANIZATION_ID = #{organizationId,jdbcType=INTEGER},
+        </if>
+        <if test="organizationName != null">
+        ORGANIZATION_NAME = #{organizationName,jdbcType=VARCHAR},
+        </if>
+        UPDATE_TIME = sysdate,
+        <if test="gender != null">
+        GENDER = #{gender,jdbcType=INTEGER},
+        </if>
+        <if test="adminLogo != null">
+        ADMIN_LOGO = #{adminLogo,jdbcType=VARCHAR},
+        </if>
+        <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="grade != null">
+        GRADE = #{grade,jdbcType=INTEGER},
+        </if>
+        <if test="status != null">
+        STATUS = #{status,jdbcType=INTEGER},
+        </if>
+    </set>
+    where ADMIN_ID = #{adminId,jdbcType=VARCHAR}
+    
+  </update>
+  
+  <update id="updateByMap" parameterType="java.util.Map">
+    update TB_ADMIN
+    <set>
+        <foreach collection="params" index="key" item="value" separator=", ">
+            <if test="key != 'where'">
+            	<if test="value.toString()=='now'">
+            		${key} = sysdate
+            	</if>
+            	<if test="value.toString()!='now'">
+            		${key} = #{value}
+            	</if>
+            </if>
+        </foreach>
+    </set>
+    <where>
+        <if test="params.where==null">
+            1=0
+        </if>
+        <if test="params.where!=null">
+            <foreach collection="params.where" index="key" item="value" separator=" and ">
+            	<if test="key.indexOf('min') ==0">
+            		<if test="value.toString()=='now'">
+            			${key.substring(3)} &gt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &gt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('max') ==0">
+        			<if test="value.toString()=='now'">
+            			${key.substring(3)} &lt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &lt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('like') ==0">
+        			${key.substring(4)} like #{value}
+        		</if>
+        		<if test="key.indexOf('min') !=0 and key.indexOf('max') !=0 and key.indexOf('like') !=0">
+            		${key} = #{value}
+        		</if>
+            </foreach>
+        </if>
+    </where>
+  </update>
+ 
+  <select id="searchRequest" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+        (select distinct a.*
+			from tb_admin a
+			left join tb_admin_role b on a.admin_id=b.admin_id
+			left join tb_role  c on b.ROLE_ID=c.ROLE_ID
+			<!-- where c.super_admin=0 or c.super_admin is null -->			
+			)
+		 <if test='where !=null and where !=""'>
+            ${where}
+            <if test="data.superAdminId != null">
+                and ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+        <if test='where ==null or where ==""'>
+            <if test="data.superAdminId != null">
+                where ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+        
+			<!-- TB_ADMIN ${where}  -->
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+        	(select distinct a.*
+				from tb_admin a
+				left join tb_admin_role b on a.admin_id=b.admin_id
+				left join tb_role  c on b.ROLE_ID=c.ROLE_ID)
+				
+		 <if test='where !=null and where !=""'>
+            ${where}
+            <if test="data.superAdminId != null">
+                and a1.ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+        <if test='where ==null or where ==""'>
+            <if test="data.superAdminId != null">
+                where a1.ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>		
+		
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+
+  <!-- 根据机构id获取机构账户-->
+    <select id="getOrganizationAdmin" resultMap="BaseResultMap" parameterType="java.lang.String">
+     select
+     <include refid="Base_Column_List" />
+      from TB_ADMIN
+        <where>
+            ORGANIZATION_ID=#{organizationId,jdbcType=BIGINT}
+        </where>
+    </select>
+
+
+	<select id="count" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_ADMIN
+        <if test='where !=null and where !=""'>
+            ${where}
+            <if test="data.superAdminId != null">
+                and ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+        <if test='where ==null or where ==""'>
+            <if test="data.superAdminId != null">
+                where ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+
+<!--		 <if test='where !=null and where !=""'>-->
+<!--	         ${where} -->
+<!--	             and   ADMIN_ID not in (select distinct a.ADMIN_ID-->
+<!--				from tb_admin a-->
+<!--				left join tb_admin_role b on a.admin_id=b.admin_id-->
+<!--				left join tb_role  c on b.ROLE_ID=c.ROLE_ID-->
+<!--				where c.super_admin=1)-->
+<!--	       </if>-->
+<!--	        <if test='where ==null or where ==""'>-->
+<!--	         where  ADMIN_ID not in (select distinct a.ADMIN_ID-->
+<!--				from tb_admin a-->
+<!--				left join tb_admin_role b on a.admin_id=b.admin_id-->
+<!--				left join tb_role  c on b.ROLE_ID=c.ROLE_ID-->
+<!--				where c.super_admin=1)-->
+<!--	       </if>-->
+		
+	</select>
+	
+	<select id="pageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List_Page_Top" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List_Page_Top" />
+        from(
+	        select 
+	        <include refid="Base_Column_List_Page" />
+	        from TB_ADMIN  a1
+	        left join TB_ADMIN_ROLE b on a1.admin_id=b.admin_id
+
+        <if test='where !=null and where !=""'>
+            ${where}
+            <if test="data.superAdminId != null">
+                and a1.ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+        <if test='where ==null or where ==""'>
+            <if test="data.superAdminId != null">
+                where a1.ADMIN_ID &lt;&gt; #{data.superAdminId,jdbcType=BIGINT}
+            </if>
+        </if>
+
+<!--	        <if test='where !=null and where !=""'>-->
+<!--	         ${where} -->
+<!--	             and   a1.ADMIN_ID not in (select distinct a.ADMIN_ID-->
+<!--				from tb_admin a-->
+<!--				left join tb_admin_role b on a.admin_id=b.admin_id-->
+<!--				left join tb_role  c on b.ROLE_ID=c.ROLE_ID-->
+<!--				where c.super_admin=1)-->
+<!--	       </if>-->
+<!--	        <if test='where ==null or where ==""'>-->
+<!--	         where  a1.ADMIN_ID not in (select distinct a.ADMIN_ID-->
+<!--				from tb_admin a-->
+<!--				left join tb_admin_role b on a.admin_id=b.admin_id-->
+<!--				left join tb_role  c on b.ROLE_ID=c.ROLE_ID-->
+<!--				where c.super_admin=1)-->
+<!--	       </if>-->
+	       
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+	
+	<select id="searchRequestSuperAdminRole" resultMap="BaseResultMap">
+	 		select 	
+				a.*,b.ADMIN_ROLE_ID,b.ROLE_ID
+			from TB_ADMIN a
+			inner join TB_ADMIN_ROLE b on  a.ADMIN_ID=b.ADMIN_ID
+            inner join TB_ROLE c  on  b.ROLE_ID=c.ROLE_ID
+			<if test=' request == null or request.where ==null or  request.where ==""'>
+			where c.SUPER_ADMIN=1
+            and a.ADMIN_ID=#{adminId}  
+			</if>
+			<if test='request !=null and request.where !=null and  request.where !=""'>
+			${request.where} 
+			and c.SUPER_ADMIN=1
+            and a.ADMIN_ID=#{adminId}  
+			</if>
+
+	</select>
+
+    <select id="getAdminList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from TB_ADMIN
+        where ADMIN_ID in
+        <foreach collection="list" index="index" item="item" open="(" separator=", " close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

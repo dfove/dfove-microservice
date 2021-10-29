@@ -1,0 +1,96 @@
+#begin
+
+spring: 
+ #配置数据源
+  datasource: 
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+     url: jdbc:oracle:thin:@192.168.31.8:1521:dfove
+     userName: jnyc
+     password: jnyc@%*123
+    max-idle: 30
+    max-wait: 30000
+    min-idle: 5
+    initial-size: 5
+  kafka:
+    consumer:
+      enable-auto-commit: false
+      bootstrap-servers:
+      - 127.0.0.1:9092
+      auto-offset-reset: earliest  
+    producer:
+      bootstrap-servers:
+      - 127.0.0.1:9092
+      acks: 1
+      client-id: kafka-producer
+      batch-size: 5    
+    
+#MyBatis的配置，主要是开启数据库中的字段名与实体对象属性的驼峰转换
+mybatis:
+  configuration: 
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 30
+    default-fetch-size: 100
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #map返回空值的装入将字段装载进去
+    call-setters-on-nulls: true 
+  mapper-locations: 
+  - classpath:mapper/*.xml
+  type-aliases-package: com.microservice.filestorage.entity  
+  
+    
+#打印sql
+logging:
+  level: 
+    com.microservice.datacenter.mapper: DEBUG
+    
+microservices: 
+  restTimeout: 200000
+  map: 
+    gateway: 
+      gateway: http://localhost:8800
+      intranet: http://localhost:8800
+      eureka: http://dfove-microservice-gateway
+    authorization: 
+      gateway: /authorization/dfove/v1
+      intranet: http://localhost:8700/dfove/v1
+      eureka: http://dfove-microservice-authorization/dfove/v1
+    websocket: 
+      gateway: /websocket
+      intranet: http://localhost:10201
+      eureka: http://dfove-websocket
+    datacleaning: 
+      gateway: /dfove-datacleaning
+      intranet: http://localhost:10091
+      eureka: http://dfove-datacleaning
+      
+syn:
+  ftp:
+    hostname: 192.168.31.2
+    port: 21
+    username: ftp
+    password: ftp  
+rsyn:
+  map:
+    kafkaTopic:
+      analysis: jnyc.analysis
+      prediction: jnyc.prediction
+
+
+ #customized
+redis: 
+  host: localhost
+  port: 6379
+  password: 
+  #zgr999
+    
+#服务注册
+eureka:
+  client: 
+    healthcheck: 
+      enabled: true
+   
+#swagger
+swagger:
+  enable: true
+      
+#end  

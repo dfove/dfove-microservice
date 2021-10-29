@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.admin.mapper.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.microservice.admin.entity.Menu">
+        <id column="MENU_ID" property="menuId" jdbcType="VARCHAR" />
+        <result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+        <result column="MENU_NAME" property="menuName" jdbcType="VARCHAR" />
+        <result column="MENU_URL" property="menuUrl" jdbcType="VARCHAR" />
+        <result column="MENU_REMARK" property="menuRemark" jdbcType="VARCHAR" />
+        <result column="MENU_TYPE" property="menuType" jdbcType="INTEGER" />
+        <result column="MENU_ORDER" property="menuOrder" jdbcType="INTEGER" />
+        <result column="MENU_IMG" property="menuImg" jdbcType="VARCHAR" />
+        <result column="COMPONENT_URL" property="componentUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BaseResultMaps" type="com.microservice.admin.entity.Menu">
+        <id column="MENU_ID" property="menuId" jdbcType="VARCHAR" />
+        <result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+        <result column="MENU_NAME" property="menuName" jdbcType="VARCHAR" />
+        <result column="MENU_URL" property="menuUrl" jdbcType="VARCHAR" />
+        <result column="MENU_REMARK" property="menuRemark" jdbcType="VARCHAR" />
+        <result column="MENU_TYPE" property="menuType" jdbcType="INTEGER" />        
+        <result column="MENU_ORDER" property="menuOrder" jdbcType="INTEGER" />
+       <!--  <result column="WHERE1" property="where" jdbcType="VARCHAR" />      -->   
+<!--         <collection property="children" select="getMenu" column="{where=WHERE1,menuId=MENU_ID}"></collection> -->
+        <collection property="children" select="getMenu" column="{menuType=MENU_TYPE,menuId=MENU_ID}"></collection>
+        
+  </resultMap>
+  
+  <resultMap id="BaseResultMapPermission" type="com.microservice.admin.entity.MenuPermission">
+        <id column="MENU_ID" property="menuId" jdbcType="VARCHAR" />
+        <result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+        <result column="MENU_NAME" property="menuName" jdbcType="VARCHAR" />
+        <result column="MENU_URL" property="menuUrl" jdbcType="VARCHAR" />
+        <result column="MENU_REMARK" property="menuRemark" jdbcType="VARCHAR" />
+        <collection property="children" select="getMenuPermission" column="MENU_ID"></collection>
+        <collection property="permission" select="getPermission" column="MENU_ID"></collection>
+  </resultMap>
+  
+  <resultMap id="AdminMenuResultMap" type="com.microservice.admin.entity.AdminMenu">
+        <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+        <result column="MENU_ID" property="menuId" jdbcType="BIGINT" />
+        <result column="PARENT_ID" property="parentId" jdbcType="BIGINT" />
+        <result column="MENU_NAME" property="menuName" jdbcType="VARCHAR" />
+        <result column="MENU_URL" property="menuUrl" jdbcType="VARCHAR" />
+        <result column="MENU_ORDER" property="menuOrder" jdbcType="INTEGER" />
+        <result column="MENU_TYPE" property="menuType" jdbcType="INTEGER" />
+        <collection property="children" select="findAdminMenusChildren" column="{adminId=ADMIN_ID,menuId=MENU_ID}"></collection>
+  </resultMap>
+  <resultMap id="SuperAdminMenuResultMap" type="com.microservice.admin.entity.AdminMenu">
+        <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+        <result column="MENU_ID" property="menuId" jdbcType="BIGINT" />
+        <result column="PARENT_ID" property="parentId" jdbcType="BIGINT" />
+        <result column="MENU_NAME" property="menuName" jdbcType="VARCHAR" />
+        <result column="MENU_URL" property="menuUrl" jdbcType="VARCHAR" />
+        <result column="MENU_ORDER" property="menuOrder" jdbcType="INTEGER" />
+        <result column="MENU_TYPE" property="menuType" jdbcType="INTEGER" />
+        <collection property="children" select="findSuperAdminMenusChildren" column="MENU_ID">
+        </collection>
+  </resultMap>
+  
+    <resultMap id="BaseResultPermission" type="com.microservice.admin.entity.Permission">
+        <id column="PERMISSION_ID" property="permissionId" jdbcType="VARCHAR" />
+        <result column="PERMISSION_NAME" property="permissionName" jdbcType="VARCHAR" />
+        <result column="API_URL" property="apiUrl" jdbcType="VARCHAR" />
+        <result column="PERMISSION_REMARK" property="permissionRemark" jdbcType="VARCHAR" />
+         <result column="POST_PERMISSION" property="postPermission" jdbcType="INTEGER" />
+        <result column="DELETE_PERMISSION" property="deletePermission" jdbcType="INTEGER" />
+        <result column="PUT_PERMISSION" property="putPermission" jdbcType="INTEGER" />
+        <result column="GET_PERMISSION" property="getPermission" jdbcType="INTEGER" />
+        <result column="MENU_ID" property="menuId" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+     MENU_ID, PARENT_ID, MENU_NAME, MENU_URL, MENU_REMARK,MENU_TYPE,MENU_ORDER,MENU_IMG,COMPONENT_URL
+  </sql>
+   <sql id="Base_PermissionColumn_List" >
+     PERMISSION_ID, PERMISSION_NAME, API_URL, PERMISSION_REMARK,POST_PERMISSION,DELETE_PERMISSION,PUT_PERMISSION,GET_PERMISSION,MENU_ID
+  </sql>
+  <!--    a.ADMIN_ID, a.ADMIN_NAME, a.REAL_NAME, m.MENU_ID, m.PARENT_ID, m.MENU_NAME, m.MENU_URL,m.MENU_TYPE, rm.MENU_ORDER -->
+  <sql id="Admin_Menu_List" >
+  rm.ADMIN_ID, rm.ADMIN_NAME, rm.REAL_NAME, m.MENU_ID, m.PARENT_ID, m.MENU_NAME, m.MENU_URL,m.MENU_TYPE, m.MENU_ORDER,m.MENU_IMG,m.COMPONENT_URL
+  </sql>
+  
+  <select id="find" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_MENU
+    where MENU_ID = #{menuId,jdbcType=BIGINT}
+  </select>
+ <!--     from TB_ADMIN a inner join TB_ADMIN_ROLE ar on a.ADMIN_ID=ar.ADMIN_ID
+		inner join TB_ROLE_MENU rm on ar.ROLE_ID=rm.ROLE_ID 
+			inner join TB_MENU m on rm.MENU_ID=m.MENU_ID
+ 				where a.ADMIN_ID=#{adminId,jdbcType=BIGINT} and m.PARENT_ID=0
+ 					order by MENU_ORDER , MENU_ID -->
+  <select id="findAdminMenus" resultMap="AdminMenuResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Admin_Menu_List" />
+
+ FROM 
+(SELECT distinct 
+a.ADMIN_ID, a.ADMIN_NAME, a.REAL_NAME,rm.menu_id
+  FROM tb_admin        a
+ INNER JOIN tb_admin_role   ar ON a.admin_id = ar.admin_id
+ INNER JOIN tb_role_menu    rm ON ar.role_id = rm.role_id where rm.restore = 0) rm
+ INNER JOIN tb_menu         m ON rm.menu_id = m.menu_id
+ 				where rm.admin_id =#{adminId,jdbcType= VARCHAR}
+                AND m.parent_id = '0'
+order by MENU_ORDER , MENU_ID
+  </select>
+  
+  <select id="findSuperAdminMenus" resultMap="SuperAdminMenuResultMap" parameterType="java.lang.String" >
+    select 
+   		<include refid="Base_Column_List" />
+   		 from TB_MENU 
+ 			where PARENT_ID='0'
+ 			order by MENU_ORDER,MENU_NAME , MENU_ID
+  </select>
+  
+  
+  <select id="findAdminMenusChildren" resultMap="AdminMenuResultMap" >
+   
+   		<if test='adminId == null or adminId == ""'>
+        select
+        <include refid="Base_Column_List" />
+         from TB_MENU where PARENT_ID=#{menuId} order by MENU_ORDER
+  		</if>
+   		<if test='adminId != null and adminId != ""'>  		
+        select 
+        <include refid="Admin_Menu_List" />
+            from (SELECT distinct a.ADMIN_ID, a.ADMIN_NAME, a.REAL_NAME,rm.menu_id
+  FROM tb_admin        a
+ INNER JOIN tb_admin_role   ar ON a.admin_id = ar.admin_id
+ INNER JOIN tb_role_menu    rm ON ar.role_id = rm.role_id
+ where a.ADMIN_ID=#{adminId,jdbcType=VARCHAR} AND rm.restore = 0
+ ) rm
+	inner join TB_MENU m on rm.MENU_ID=m.MENU_ID
+ 	  where   m.PARENT_ID=#{menuId,jdbcType=VARCHAR}
+ 	  order by m.MENU_ORDER , m.MENU_ID
+  		</if>
+  </select>
+  <select id="findSuperAdminMenusChildren" resultMap="SuperAdminMenuResultMap" >  
+        select 
+        <include refid="Base_Column_List" />
+         from TB_MENU where PARENT_ID=#{menuId}
+         order by MENU_ORDER
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from TB_MENU
+    where MENU_ID = #{menuId,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="add" parameterType="com.microservice.admin.entity.Menu">
+    insert into TB_MENU
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="menuId != null">
+        MENU_ID,
+        </if>
+        <if test="parentId != null">
+        PARENT_ID,
+        </if>
+        <if test="menuName != null">
+        MENU_NAME,
+        </if>
+        <if test="menuUrl != null">
+        MENU_URL,
+        </if>
+        <if test="menuRemark != null">
+        MENU_REMARK,
+        </if>
+        <if test="menuType != null">
+        MENU_TYPE,
+        </if>
+        <if test="menuOrder != null">
+        MENU_ORDER,
+        </if>
+        <if test="menuImg != null">
+            MENU_IMG,
+        </if>
+        <if test="componentUrl != null">
+            COMPONENT_URL,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="menuId != null">
+        #{menuId,jdbcType=VARCHAR},
+        </if>
+        <if test="parentId != null">
+        #{parentId,jdbcType=VARCHAR},
+        </if>
+        <if test="menuName != null">
+        #{menuName,jdbcType=VARCHAR},
+        </if>
+        <if test="menuUrl != null">
+        #{menuUrl,jdbcType=VARCHAR},
+        </if>
+        <if test="menuRemark != null">
+        #{menuRemark,jdbcType=VARCHAR},
+        </if>
+        <if test="menuType != null">
+        #{menuType,jdbcType=INTEGER},
+        </if>
+        <if test="menuOrder != null">
+        #{menuOrder,jdbcType=INTEGER},
+        </if>
+        <if test="menuImg != null">
+        #{menuImg,jdbcType=VARCHAR},
+        </if>
+        <if test="componentUrl != null">
+        #{componentUrl,jdbcType=VARCHAR},
+        </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.microservice.admin.entity.Menu">
+    update TB_MENU
+    <set>
+        <if test='parentId != null '>
+        PARENT_ID = #{parentId,jdbcType=VARCHAR},
+        </if>
+        <if test='menuName != null '>
+        MENU_NAME = #{menuName,jdbcType=VARCHAR},
+        </if>
+        <if test='menuUrl != null '>
+        MENU_URL = #{menuUrl,jdbcType=VARCHAR},
+        </if>
+        <if test='menuRemark != null'>
+        MENU_REMARK = #{menuRemark,jdbcType=VARCHAR},
+        </if>
+        <if test='menuType != null'>
+         MENU_TYPE =#{menuType,jdbcType=INTEGER},
+        </if>
+        <if test='menuOrder != null'>
+         MENU_ORDER =#{menuOrder,jdbcType=INTEGER},
+        </if>
+        <if test='menuImg != null '>
+         MENU_IMG = #{menuImg,jdbcType=VARCHAR},
+        </if>
+        <if test='componentUrl != null'>
+         COMPONENT_URL = #{componentUrl,jdbcType=VARCHAR},
+        </if>
+    </set>
+    where MENU_ID = #{menuId,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByMap" parameterType="java.util.Map">
+    update TB_MENU
+    <set>
+        <foreach collection="params" index="key" item="value" separator=", ">
+            <if test="key != 'where'">
+            	<if test="value.toString()=='now'">
+            		${key} = sysdate
+            	</if>
+            	<if test="value.toString()!='now'">
+            		${key} = #{value}
+            	</if>
+            </if>
+        </foreach>
+    </set>
+    <where>
+        <if test="params.where==null">
+            1=0
+        </if>
+        <if test="params.where!=null">
+            <foreach collection="params.where" index="key" item="value" separator=" and ">
+            	<if test="key.indexOf('min') ==0">
+            		<if test="value.toString()=='now'">
+            			${key.substring(3)} &gt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &gt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('max') ==0">
+        			<if test="value.toString()=='now'">
+            			${key.substring(3)} &lt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &lt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('like') ==0">
+        			${key.substring(4)} like #{value}
+        		</if>
+        		<if test="key.indexOf('min') !=0 and key.indexOf('max') !=0 and key.indexOf('like') !=0">
+            		${key} = #{value}
+        		</if>
+            </foreach>
+        </if>
+    </where>
+  </update>
+ 
+  <select id="searchRequest" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+			TB_MENU ${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+				from TB_MENU ${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+  <select id="searchRequests" resultMap="BaseResultMaps" parameterType="common.search.entity.SearchRequest">
+		select
+	<!-- <include refid="Base_Column_List" /> -->
+		 	<if test='where !=null and where !=""'>
+		 	<if test='data.menuType !=null and data.menuType !=""'>
+		 	     MENU_ID, PARENT_ID, MENU_NAME, MENU_URL, MENU_REMARK,${data.menuType} as MENU_TYPE,MENU_IMG,COMPONENT_URL		 ,MENU_ORDER
+		 	</if>
+		 	<if test='data.menuType ==null or data.menuType ==""'>
+		 	     MENU_ID, PARENT_ID, MENU_NAME, MENU_URL, MENU_REMARK, MENU_TYPE ,MENU_ORDER,MENU_IMG,COMPONENT_URL
+		 	</if>
+				from TB_MENU 
+				<where>
+                    <if test='data.menuId!=null and data.menuId!=""'>
+                       and  MENU_ID=#{data.menuId}
+                    </if>
+                    <if test='data.menuName!=null and data.menuName!=""'>
+                        and  MENU_NAME=#{data.menuName}
+                    </if>
+<!--                    <if test='data.menuType!=null and data.menuType!=“”'>-->
+<!--                        and  MENU_TYPE=#{data.menuType}-->
+<!--                    </if>-->
+                    <if test='data.parentId!=null and data.parentId!=""'>
+                        and  PARENT_ID=#{data.parentId}
+                    </if>
+                    and PARENT_ID!=MENU_ID
+                </where>
+			</if>
+		 	<if test='where ==null or where ==""'>
+		 <!-- 	<include refid="Base_Column_List" /> -->
+			 MENU_ID, PARENT_ID, MENU_NAME, MENU_URL, MENU_REMARK, '' as MENU_TYPE	,MENU_ORDER,MENU_IMG,COMPONENT_URL
+		 		from TB_MENU 
+				<!-- ${where}  and PARENT_ID!=MENU_ID  -->
+				where PARENT_ID!=MENU_ID  
+			</if>
+			  		    
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>     
+	</select>
+	
+      <select id="searchRequestPermission" resultMap="BaseResultMapPermission" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from TB_MENU ${where}   		    
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>     
+	</select>
+	
+	<select id="getMenu" resultMap="BaseResultMaps" >
+        select 
+        <include refid="Base_Column_List" />
+         from TB_MENU 
+         	where  PARENT_ID!=MENU_ID 
+         	
+         		and  PARENT_ID=#{menuId} order by MENU_ORDER
+ <!--         	<if test='menuType !=null and menuType !=""'>
+				and  MENU_TYPE=#{menuType}
+			</if> -->
+         	
+<!-- 	        <if test='where1 !=null and where1 !=""'>
+				${where1} and PARENT_ID!=MENU_ID and  PARENT_ID=#{menuId}
+			</if> 
+	        <if test='where ==null or where ==""'>
+				where  PARENT_ID!=MENU_ID and  PARENT_ID=#{menuId}
+			</if>  -->
+			   
+    </select>
+    
+	<select id="getMenuPermission" resultMap="BaseResultMapPermission" >
+        select 
+        <include refid="Base_Column_List" />
+         from TB_MENU where PARENT_ID!=MENU_ID and PARENT_ID=#{menuId}
+    </select>
+    
+	<select id="getPermission" resultMap="BaseResultPermission" >
+        select 
+        <include refid="Base_PermissionColumn_List" />
+         from TB_Permission where MENU_ID=#{menuId}
+    </select>
+    
+    
+	<select id="count" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_MENU ${where}
+	</select>
+	
+	<select id="pageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List" />
+        from(
+	        select 
+	        <include refid="Base_Column_List" />
+	        from TB_MENU ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+
+
+<!--   校验是否有子集菜单-->
+    <select id="chekeMenusChildren" resultMap="BaseResultMap" >
+            select
+            <include refid="Base_Column_List" />
+            from TB_MENU where PARENT_ID=#{menuId} order by MENU_ORDER
+    </select>
+
+
+</mapper>

@@ -1,0 +1,82 @@
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 512Mb
+      max-request-size: 512Mb
+ #临时目录     
+  tomcat:
+    basedir: /data/jnyc/temp
+  http:
+    multipart:
+      location: /data/upload_tmp
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@192.168.31.8:1521:dfove
+    userName: jnyc
+    password: jnyc@%*123
+    max-idle: 30
+    max-wait: 30000
+    min-idle: 5
+    initial-size: 5
+  kafka:
+    consumer:
+      enable-auto-commit: false
+      bootstrap-servers:
+      - 127.0.0.1:9092
+      auto-offset-reset: earliest  
+    producer:
+      bootstrap-servers:
+      - 127.0.0.1:9092
+      acks: 1
+      client-id: kafka-producer
+      batch-size: 5
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 30
+    default-fetch-size: 100
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations:
+  - classpath:mapper/*.xml
+  type-aliases-package: com.microservice.fastdfs.entity
+fdfs:
+  so-timeout: 1500
+  connect-timeout: 600
+  thumb-image:
+    width: 200
+    height: 200
+  tracker-list:
+  - 192.168.31.8:22122
+  pool:
+    max-total: 150
+    max-wait-millis: 2000
+
+
+microservices: 
+  restTimeout: 200000
+  map: 
+    gateway: 
+      gateway: http://localhost:8800
+      intranet: http://localhost:8800
+      eureka: http://dfove-microservice-gateway
+    authorization: 
+      gateway: /authorization/dfove/v1
+      intranet: http://localhost:8700/dfove/v1
+      eureka: http://dfove-microservice-authorization/dfove/v1
+    websocket: 
+      gateway: /websocket
+      intranet: http://localhost:10201
+      eureka: http://dfove-websocket
+    log:
+      gateway: /log
+      intranet: http://localhost:10131
+      eureka: http://dfove-log
+
+
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+swagger:
+  enable: true

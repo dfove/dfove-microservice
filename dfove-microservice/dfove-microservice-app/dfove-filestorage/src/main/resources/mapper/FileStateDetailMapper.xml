@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.microservice.filestorage.mapper.FileStateDetailMapper">
+  <resultMap id="BaseResultMap" type="com.microservice.filestorage.entity.FileStateDetail">
+    <id column="ID" jdbcType="INTEGER" property="VARCHAR" />
+    <result column="FILE_STATE_ID" jdbcType="VARCHAR" property="fileStateId" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="TYPE" jdbcType="VARCHAR" property="type" />
+    <result column="MESSAGE" jdbcType="VARCHAR" property="message" />
+    <result column="STATE" jdbcType="VARCHAR" property="state" />
+    <result column="TAB" jdbcType="VARCHAR" property="tab" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID,FILE_STATE_ID, NAME, TYPE, MESSAGE, STATE, TAB
+  </sql>
+  <select id="findbyFileStateId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TB_FILE_STATE_DETAIL
+    where FILE_STATE_ID = #{fileStateid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from TB_FILE_STATE_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.microservice.filestorage.entity.FileStateDetail">
+    insert into TB_FILE_STATE_DETAIL (FILE_STATE_ID, NAME, TYPE, 
+      MESSAGE, STATE, TAB
+      )
+    values (#{fileStateId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR},
+      #{message,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, #{tab,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="add" parameterType="com.microservice.filestorage.entity.FileStateDetail">
+    insert into TB_FILE_STATE_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+    	ID,
+      <if test="fileStateId != null">
+        FILE_STATE_ID,
+      </if>
+      <if test="name != null">
+        NAME,
+      </if>
+      <if test="type != null">
+        TYPE,
+      </if>
+      <if test="message != null">
+        MESSAGE,
+      </if>
+      <if test="state != null">
+        STATE,
+      </if>
+      <if test="tab != null">
+        TAB,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        #{id,jdbcType=VARCHAR},
+      <if test="fileStateId != null">
+        #{fileStateId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="tab != null">
+        #{tab,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.microservice.filestorage.entity.FileStateDetail">
+    update TB_FILE_STATE_DETAIL
+    <set>
+      <if test="fileStateId != null">
+        FILE_STATE_ID = #{fileStateId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        TYPE = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        MESSAGE = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="tab != null">
+        TAB = #{tab,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.microservice.filestorage.entity.FileStateDetail">
+    update TB_FILE_STATE_DETAIL
+    set NAME = #{name,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR},
+      MESSAGE = #{message,jdbcType=VARCHAR},
+      STATE = #{state,jdbcType=VARCHAR},
+      TAB = #{tab,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

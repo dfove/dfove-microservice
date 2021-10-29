@@ -1,0 +1,244 @@
+#centos安装fastDFS步骤非root用户下ALL
+#第一步:安装依赖库和环境
+	sudo yum -y install gcc-c++
+	sudo yum -y install libevent
+	sudo yum -y install net-tools
+	
+#第二步:准备fastDFS资源，存放路径cd /home/dtph/fastdfs下
+	sudo mkdir -p /home/dtph/fastdfs
+	cd /home/dtph/fastdfs
+	###-upload
+	libfastcommonV1.0.7.tar.gz
+	FastDFS_v5.05.tar.gz
+	fastdfs-nginx-module_v1.16.tar.gz
+	pcre-8.39.tar.gz
+	zlib-1.2.11.tar.gz
+	nginx-1.12.2.tar.gz
+	test-upload.jpg
+	
+#第三步: 解压XXX.tar.gz && 创建fastDFS数据文件夹
+	cd /home/dtph/fastdfs
+	tar -zxvf libfastcommonV1.0.7.tar.gz
+	tar -zxvf FastDFS_v5.05.tar.gz
+	tar -zxvf fastdfs-nginx-module_v1.16.tar.gz
+	tar -zxvf pcre-8.39.tar.gz
+	tar -zxvf zlib-1.2.11.tar.gz
+	tar -zxvf nginx-1.12.2.tar.gz
+	###
+	sudo mkdir -p /home/dtph/fastdfs/datas/tracker
+	sudo mkdir -p /home/dtph/fastdfs/datas/storage
+	sudo mkdir -p /home/dtph/fastdfs/datas/client
+	sudo mkdir -p /home/dtph/fastdfs/datas/nginx
+	
+#第四步: fastDFS安装
+	cd /home/dtph/fastdfs/libfastcommon-1.0.7
+	./make.sh
+	sudo ./make.sh install
+	###
+	cd /home/dtph/fastdfs/FastDFS
+	./make.sh
+	sudo ./make.sh install
+	
+#第五步:fastDFS配置tracker.conf,storage.conf,client.conf
+	cd /etc/fdfs/
+	sudo cp tracker.conf.sample tracker.conf
+	sudo cp storage.conf.sample storage.conf
+	sudo cp client.conf.sample client.conf
+	sudo chmod 777 -R /etc/fdfs/
+	###
+	vim tracker.conf #修改文件
+		disabled=false #启用配置文件
+		port=22122 #设置tracker的端口号
+	  	base_path=/home/dtph/fastdfs/datas/tracker #设置tracker的数据文件和日志目录
+	  	store_group=group1 #设置组名
+		http.server_port=9990 #设置http端口号
+	###
+	vim storage.conf #修改文件
+		disabled=false #启用配置文件
+		group_name=group1 #设置组名
+	  	base_path=/home/dtph/fastdfs/datas/storage #设置storage日志路径
+	  	store_path_count=1 #存储路径个数，需要和store_path个数匹配
+	  	store_path0=/home/dtph/fastdfs/datas/storage #存储路径
+	  	tracker_server=192.168.1.231:22122 #tracker服务器的IP地址和端口号
+		http.server_port=9991 #设置http端口号
+	###
+	vim client.conf #修改文件
+		base_path=/home/dtph/fastdfs/datas/client #client日志路径
+	  	tracker_server=192.168.1.231:22122 #tracker服务器的IP和端口号,有多个服务器可以另一行
+		http.tracker_server_port=9991 #设置storage-http端口号
+		
+#第六步: 测试fastDFS文件上传
+	#启动fastDFS
+	sudo fdfs_trackerd /etc/fdfs/tracker.conf
+	sudo fdfs_storaged /etc/fdfs/storage.conf
+	#上传图片
+	fdfs_upload_file /etc/fdfs/client.conf /home/dtph/fastdfs/test-upload.jpg
+	#关闭fastDFS
+	sudo killall fdfs_trackerd 
+	sudo killall fdfs_storaged
+	
+#第七步: 安装nginx服务
+	cd /home/dtph/fastdfs/pcre-8.39
+    ./configure
+    sudo make
+    sudo make install
+	###
+	cd /home/dtph/fastdfs/zlib-1.2.11
+    ./configure
+    sudo make
+    sudo make install
+	###
+	cd /home/dtph/fastdfs/nginx-1.12.2
+    ./configure
+    sudo make
+    sudo make install
+	#安装成功之后，默认会在/usr/local/下创建nginx目录
+	#检查
+	sudo /usr/local/nginx/sbin/nginx -t
+	#启动
+	sudo /usr/local/nginx/sbin/nginx
+	#关闭
+	sudo pkill -9 nginx
+	
+#第八步: fastDFS+nginx整合配置
+   sudo chmod 777 -R /home/dtph/fastdfs/fastdfs-nginx-module/
+   cd /home/dtph/fastdfs/fastdfs-nginx-module/src
+   vim config #修改文件,去除CORE_INCS中的local，因为fastdfs和fastcommon在/usr/include中
+   ##
+   cd /home/dtph/fastdfs/nginx-1.12.2
+   ./configure --add-module=/home/dtph/fastdfs/fastdfs-nginx-module/src
+   sudo make
+   sudo make install
+   ##
+   cd /home/dtph/fastdfs/fastdfs-nginx-module/src
+   sudo cp mod_fastdfs.conf /etc/fdfs
+   ##
+   cd /home/dtph/fastdfs/FastDFS/conf
+   sudo cp http.conf /etc/fdfs
+   sudo cp mime.types /etc/fdfs
+   
+#第九步: fastDFS+nginx修改配置
+   sudo chmod 777 -R /etc/fdfs/
+   cd /etc/fdfs/
+   vim mod_fastdfs.conf #修改文件
+	   base_path=/home/dtph/fastdfs/datas/nginx #保存日志目录
+	   tracker_server=10.10.10.81:22122 #tracker服务器的IP和端口号
+	   storage_server_port=23000 #storage服务器的端口号
+	   group_name=group1 #当前服务器的group名
+	   url_have_group_name=true #文件url中是否有group名
+	   store_path_count=1 #存储路径个数，需要和store_path 个数匹配
+	   store_path0=/home/dtph/fastdfs/datas/storage #存储路径
+	   group_count=1 #设置组的个数
+	   #然后在文件末尾添加分组信息，目前只有一个分组，就只写一个
+	   [group1]
+	   group_name=group1
+	   storage_server_port=23000
+	   store_path_count=1
+	   store_path0=/home/dtph/fastdfs/datas/storage
+	##
+	sudo chmod 777 -R /usr/local/nginx/conf/nginx.conf
+	cd /usr/local/nginx/conf
+	vim nginx.conf #修改文件
+		user root #在nginx.conf文件第一行添加*非root用户下操作&重点*
+		#user  nobody
+		listen 9990 #修改端口为9990
+		#在server {} 里添加以下任一方式都行。
+		#方式1
+		location /group1/M00/{
+			alias /home/dtph/fastdfs/datas/storage/data;
+		}
+		#方式2--推荐
+		location /group1/M00/{
+			root /home/dtph/fastdfs/datas/storage;
+			ngx_fastdfs_module;
+		}
+		#方式3--推荐
+		location ~ /group[1-9]/M00 {
+            root /home/dtph/fastdfs/datas/storage;
+            ngx_fastdfs_module;
+        }
+		#方式4
+		location ~/group([0-9])/M00  { 
+			alias /home/dtph/fastdfs/datas/storage/data; 
+			ngx_fastdfs_module; 
+		} 
+		
+#第十步:启动 && 重启 && 停止 && 查询
+	#启动
+	sudo fdfs_trackerd /etc/fdfs/tracker.conf
+	sudo fdfs_storaged /etc/fdfs/storage.conf
+	sudo /usr/local/nginx/sbin/nginx
+	#重启
+	sudo /usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf restart
+	sudo /usr/bin/fdfs_storaged /etc/fdfs/storage.conf restart
+	cd /usr/local/nginx/sbin/
+	sudo ./nginx -s reload
+	#停止
+	sudo killall fdfs_trackerd 
+	sudo killall fdfs_storaged
+	sudo pkill -9 nginx
+	#查询
+	sudo netstat -unltp|grep fdfs
+	sudo netstat -unltp|grep nginx
+	ps aux|grep nginx
+	#netstat -lntp #查看监听(Listen)的端口
+	#netstat -antp #查看所有建立的TCP连接
+	#sudo find / -name nginx #查询文件所在位置
+	 
+#第十步:设置自动启动
+	#rc.local-启动
+	sudo chmod 777 -R /etc/rc.d/rc.local
+	cd /etc/rc.d/
+	vim rc.local #修改文件 添加以下三行
+		/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf restart
+		/usr/bin/fdfs_storaged /etc/fdfs/storage.conf restart
+		/usr/local/nginx/sbin/nginx
+	sudo chmod +x /etc/rc.d/rc.local
+	
+	#shell-启动 
+	sudo mkdir -p /home/dtph/shell
+	sudo touch /home/dtph/shell/aotoStart.sh
+	sudo touch /home/dtph/shell/info.log
+	sudo touch /home/dtph/shell/error.log
+	sudo chmod 777 -R /home/dtph/shell/
+	cd /home/dtph/shell/
+	vim aotoStart.sh #修改文件,添加以下code
+		#!/bin/bash
+		echo "start fastdfs & nginx"
+		fdfs_trackerd /etc/fdfs/tracker.conf
+		fdfs_storaged /etc/fdfs/storage.conf
+		sudo /usr/local/nginx/sbin/nginx
+	cd /etc/rc.d/	
+	vim rc.local #修改文件,添加以下代码
+		bash /home/dtph/shell/aotoStart.sh >> /home/dtph/shell/info.log 2>> /home/dtph/shell/error.log
+	sudo chmod +x /etc/rc.d/rc.local
+	
+	##重启sudo reboot
+
+#第十一步:开放防火墙端口
+	#放行端口
+	sudo firewall-cmd --zone=public --add-port=22122/tcp --permanent
+	sudo firewall-cmd --zone=public --add-port=9191/tcp --permanent
+	#重载
+	sudo firewall-cmd --reload
+	#查看
+	sudo firewall-cmd --zone=public --query-port=22122/tcp
+	sudo firewall-cmd --zone=public --query-port=9191/tcp
+	#删除
+	sudo firewall-cmd --zone=public --remove-port=22122/tcp --permanent
+	sudo firewall-cmd --zone=public --remove-port=9191/tcp --permanent
+	
+	#批量开放端口sudo irewall-cmd --zone=public --add-port=8080-9090/tcp --permanent 
+
+#第十二步:测试
+http://192.168.1.231:9191/group1/M00/00/00/wKgB51x176OAFgj4AABlPOgYq40058.jpg
+
+windows cmd	telnet 192.168.1.231 9191
+windows cmd	telnet 192.168.1.231 22122
+
+---------------
+#sudo yum remove zlib
+#sudo yum remove pcre-devel
+#sudo make uninstall
+#sudo apt-get --purge remove nginx
+

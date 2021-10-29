@@ -1,0 +1,4 @@
+{
+"none":["/dfove/v1/auth/anonymous","/dfove/v1/user/login","/dfove/v1/admin/login","/dfove/v1/config/"],
+"anonymous":["/dfove/v1/user/","/dfove/v1/project/"]
+}

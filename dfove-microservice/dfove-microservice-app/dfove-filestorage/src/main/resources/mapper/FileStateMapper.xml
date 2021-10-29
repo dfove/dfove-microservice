@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.microservice.filestorage.mapper.FileStateMapper">
+  <resultMap id="BaseResultMap" type="com.microservice.filestorage.entity.FileState">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="ORIGINAL_FILE_NAME" jdbcType="VARCHAR" property="originalFileName" />
+    <result column="FILE_NAME" jdbcType="VARCHAR" property="fileName" />
+    <result column="CONTENT_TYPE" jdbcType="VARCHAR" property="contentType" />
+    <result column="EXT" jdbcType="VARCHAR" property="ext" />
+    <result column="FILE_SIZE" jdbcType="DECIMAL" property="fileSize" />
+    <result column="GROUP1" jdbcType="VARCHAR" property="group1" />
+    <result column="FULL_PATH" jdbcType="VARCHAR" property="fullPath" />
+    <result column="PATH" jdbcType="VARCHAR" property="path" />
+    <result column="STATE" jdbcType="VARCHAR" property="state" />
+    <result column="MESSAGE" jdbcType="VARCHAR" property="message" />
+    <result column="TAB" jdbcType="VARCHAR" property="tab" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, ORIGINAL_FILE_NAME, FILE_NAME, CONTENT_TYPE, EXT, FILE_SIZE, GROUP1, FULL_PATH, 
+    PATH, STATE, MESSAGE, TAB
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from TB_FILE_STATE
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from TB_FILE_STATE
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.microservice.filestorage.entity.FileState">
+    insert into TB_FILE_STATE (ID, ORIGINAL_FILE_NAME, FILE_NAME, 
+      CONTENT_TYPE, EXT, FILE_SIZE, 
+      GROUP1, FULL_PATH, PATH, 
+      STATE, MESSAGE, TAB
+      )
+    values (#{id,jdbcType=DECIMAL}, #{originalFileName,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, 
+      #{contentType,jdbcType=VARCHAR}, #{ext,jdbcType=VARCHAR}, #{fileSize,jdbcType=DECIMAL}, 
+      #{group1,jdbcType=VARCHAR}, #{fullPath,jdbcType=VARCHAR}, #{path,jdbcType=VARCHAR}, 
+      #{state,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}, #{tab,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.microservice.filestorage.entity.FileState">
+    insert into TB_FILE_STATE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="originalFileName != null">
+        ORIGINAL_FILE_NAME,
+      </if>
+      <if test="fileName != null">
+        FILE_NAME,
+      </if>
+      <if test="contentType != null">
+        CONTENT_TYPE,
+      </if>
+      <if test="ext != null">
+        EXT,
+      </if>
+      <if test="fileSize != null">
+        FILE_SIZE,
+      </if>
+      <if test="group1 != null">
+        GROUP1,
+      </if>
+      <if test="fullPath != null">
+        FULL_PATH,
+      </if>
+      <if test="path != null">
+        PATH,
+      </if>
+      <if test="state != null">
+        STATE,
+      </if>
+      <if test="message != null">
+        MESSAGE,
+      </if>
+      <if test="tab != null">
+        TAB,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="originalFileName != null">
+        #{originalFileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="contentType != null">
+        #{contentType,jdbcType=VARCHAR},
+      </if>
+      <if test="ext != null">
+        #{ext,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=DECIMAL},
+      </if>
+      <if test="group1 != null">
+        #{group1,jdbcType=VARCHAR},
+      </if>
+      <if test="fullPath != null">
+        #{fullPath,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null">
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="tab != null">
+        #{tab,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.microservice.filestorage.entity.FileState">
+    update TB_FILE_STATE
+    <set>
+      <if test="originalFileName != null">
+        ORIGINAL_FILE_NAME = #{originalFileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="contentType != null">
+        CONTENT_TYPE = #{contentType,jdbcType=VARCHAR},
+      </if>
+      <if test="ext != null">
+        EXT = #{ext,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        FILE_SIZE = #{fileSize,jdbcType=DECIMAL},
+      </if>
+      <if test="group1 != null">
+        GROUP1 = #{group1,jdbcType=VARCHAR},
+      </if>
+      <if test="fullPath != null">
+        FULL_PATH = #{fullPath,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null">
+        PATH = #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        STATE = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null">
+        MESSAGE = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="tab != null">
+        TAB = #{tab,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.microservice.filestorage.entity.FileState">
+    update TB_FILE_STATE
+    set ORIGINAL_FILE_NAME = #{originalFileName,jdbcType=VARCHAR},
+      FILE_NAME = #{fileName,jdbcType=VARCHAR},
+      CONTENT_TYPE = #{contentType,jdbcType=VARCHAR},
+      EXT = #{ext,jdbcType=VARCHAR},
+      FILE_SIZE = #{fileSize,jdbcType=DECIMAL},
+      GROUP1 = #{group1,jdbcType=VARCHAR},
+      FULL_PATH = #{fullPath,jdbcType=VARCHAR},
+      PATH = #{path,jdbcType=VARCHAR},
+      STATE = #{state,jdbcType=VARCHAR},
+      MESSAGE = #{message,jdbcType=VARCHAR},
+      TAB = #{tab,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+</mapper>

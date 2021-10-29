@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>dfove-microservice</groupId>
+	<artifactId>dfove-microservice</artifactId>
+	<version>0.0.1-SNAPSHOT</version><!-- RELEASE -->
+	<packaging>pom</packaging>
+	<name>dfove-microservice</name>
+	<description>dfove-microservice parent</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.2.RELEASE</version>
+		<relativePath />
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+
+		<mybatis.version>1.3.2</mybatis.version>
+		<oracle.version>12.1.0.2</oracle.version>
+		<maven.test.skip>true</maven.test.skip>
+
+		<jnyc.version>0.0.1-SNAPSHOT</jnyc.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- common -->
+			<dependency>
+				<groupId>dfove-common</groupId>
+				<artifactId>dfove-common-tools</artifactId>
+				<version>${jnyc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dfove-common</groupId>
+				<artifactId>dfove-common-redis</artifactId>
+				<version>${jnyc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dfove-common</groupId>
+				<artifactId>dfove-common-mq</artifactId>
+				<version>${jnyc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dfove-common</groupId>
+				<artifactId>dfove-common-search</artifactId>
+				<version>${jnyc.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<!-- 添加子模板 -->
+	<modules>
+		<!--  核心 -->
+		<module>dfove-microservice-core</module>
+		<!--  注册中心 -->
+		<module>dfove-microservice-eureka</module>
+		<!--  配置中心 -->
+		<module>dfove-microservice-config</module>
+		<!--  认证服务 -->
+		<module>dfove-microservice-authorization</module>
+		<!--  网关 -->
+		<module>dfove-microservice-gateway</module>
+		<!--  微服务 -->
+		<module>dfove-microservice-provider</module>
+		<!--  应用程序 -->
+		<module>dfove-microservice-app</module>
+	</modules>
+
+</project>

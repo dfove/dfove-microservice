@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>dfove-microservice-provider</artifactId>
+	<packaging>pom</packaging>
+	<name>dfove-microservice-provider</name>
+	<description>dfove-microservice provider</description>
+
+	<parent>
+		<groupId>dfove-microservice</groupId>
+		<artifactId>dfove-microservice</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.retry</groupId>
+			<artifactId>spring-retry</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>${mybatis.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>${oracle.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.xiaoymin</groupId>
+			<artifactId>swagger-bootstrap-ui</artifactId>
+			<version>1.8.7</version>
+		</dependency>
+
+		<!-- 整合hystrix -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+		</dependency>
+
+		<!-- 高版本需要导入 -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.0</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+
+		<dependency>
+			<groupId>dfove-common</groupId>
+			<artifactId>dfove-common-redis</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>dfove-common</groupId>
+			<artifactId>dfove-common-mq</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>dfove-common</groupId>
+			<artifactId>dfove-common-search</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>dfove-microservice</groupId>
+			<artifactId>dfove-microservice-core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<!--Java工具类库-->
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-all</artifactId>
+			<version>5.4.6</version>
+		</dependency>
+	</dependencies>
+
+	<!-- 添加子模板 -->
+	<modules>
+		<module>dfove-admin</module>
+	</modules>
+
+</project>

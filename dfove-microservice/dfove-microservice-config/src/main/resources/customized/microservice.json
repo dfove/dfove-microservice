@@ -1,0 +1,7 @@
+{
+  "gateway": "http://www.dt.com:8801/",
+  "authorization": "authorization/dfove/v1/",
+  "user": "user/dfove/v1/",
+  "project": "project/dfove/v1/",
+  "invest": "invest/dfove/v1/"
+}

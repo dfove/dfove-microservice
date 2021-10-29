@@ -1,0 +1,61 @@
+#begin
+
+spring:
+  #配置数据源
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@192.168.31.8:1521:dfove
+    userName: jnyc
+    password: jnyc@%*123
+    max-idle: 30
+    max-wait: 30000
+    min-idle: 5
+    initial-size: 5
+
+
+#服务注册
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+
+microservices:
+  restTimeout: 20000
+  map:
+    gateway:
+      gateway: http://localhost:8800
+      intranet: http://localhost:8800
+      eureka: http://dfove-microservice-gateway
+    authorization:
+      gateway: /authorization
+      intranet: http://localhost:8700
+      eureka: http://dfove-microservice-authorization
+    admin:
+      gateway: /admin
+      intranet: http://localhost:10001
+      eureka: http://jnyc-admin
+
+swagger:
+  enable: true
+
+elasticsearch:
+  nodes:
+    - "localhost:9200"
+
+log:
+  operate-type-map:
+    login: "登录"
+    logout: "登出"
+    query: "查询"
+    create: "创建"
+    update: "更新"
+    delete: "删除"
+    start: "开始"
+    stop: "停止"
+    finish: "完成"
+    upload: "上传"
+    download: "下载"
+    import: "导入"
+    export: "导出"
+
+#end

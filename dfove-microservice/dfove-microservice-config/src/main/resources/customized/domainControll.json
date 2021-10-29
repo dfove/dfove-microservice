@@ -1,0 +1,24 @@
+{
+  "defaultDomain": "dtph",
+  "secret": "dnfjdf0343ibhgydfdbfh^^%$$%(sdsnj",
+  "domains": {
+    "dtph": {
+      "name": "dtph",
+      "anonymous": "dtph-anonymous",
+      "password": "dtph-anonymous-8934sndYbshdbsh",
+      "expiration": 1200
+    },
+    "admin": {
+      "name": "admin",
+      "anonymous": "admin-anonymous",
+      "password": "admin-anonymous-KMKSJhfjhduhhgfdd834knm",
+      "expiration": 1200
+    },
+    "yinda": {
+      "name": "yinda",
+      "anonymous": "yinda-anonymous",
+      "password": "yinda-anonymous-hjUZyfddjf9o34knjk8sd",
+      "expiration": 1200
+    }
+  }
+}

@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.admin.mapper.PermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.microservice.admin.entity.Permission">
+        <id column="PERMISSION_ID" property="permissionId" jdbcType="VARCHAR" />
+        <result column="PERMISSION_NAME" property="permissionName" jdbcType="VARCHAR" />
+        <result column="API_URL" property="apiUrl" jdbcType="VARCHAR" />
+        <result column="PERMISSION_REMARK" property="permissionRemark" jdbcType="VARCHAR" />
+         <result column="POST_PERMISSION" property="postPermission" jdbcType="INTEGER" />
+        <result column="DELETE_PERMISSION" property="deletePermission" jdbcType="INTEGER" />
+        <result column="PUT_PERMISSION" property="putPermission" jdbcType="INTEGER" />
+        <result column="GET_PERMISSION" property="getPermission" jdbcType="INTEGER" />
+        <result column="MENU_ID" property="menuId" jdbcType="INTEGER" />
+        <result column="PERMISSION_IDENT" property="permissionIdent" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <resultMap id="AdminPermissionResultMap" type="com.microservice.admin.entity.AdminPermission">
+        <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+        <result column="PERMISSION_ID" property="permissionId" jdbcType="VARCHAR" />
+        <result column="PERMISSION_NAME" property="permissionName" jdbcType="VARCHAR" />
+        <result column="API_URL" property="apiUrl" jdbcType="VARCHAR" />
+        <result column="POST_PERMISSION" property="postPermission" jdbcType="INTEGER" />
+        <result column="DELETE_PERMISSION" property="deletePermission" jdbcType="INTEGER" />
+        <result column="PUT_PERMISSION" property="putPermission" jdbcType="INTEGER" />
+        <result column="GET_PERMISSION" property="getPermission" jdbcType="INTEGER" />
+        <result column="MENU_ID" property="menuId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+     PERMISSION_ID, PERMISSION_NAME, API_URL, PERMISSION_REMARK,POST_PERMISSION,DELETE_PERMISSION,PUT_PERMISSION,GET_PERMISSION,MENU_ID,PERMISSION_IDENT
+  </sql>
+  
+  <sql id="Admin_Permission_List" >
+     a.ADMIN_ID, a.ADMIN_NAME, a.REAL_NAME, p.PERMISSION_ID, p.PERMISSION_NAME, p.API_URL, ra.POST_PERMISSION, ra.DELETE_PERMISSION, ra.PUT_PERMISSION, ra.GET_PERMISSION,p.MENU_ID
+  </sql>
+  
+  <select id="find" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_PERMISSION
+    where PERMISSION_ID = #{permissionId,jdbcType=VARCHAR}
+  </select>
+  
+<select id="findAdminPermissions" resultMap="AdminPermissionResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Admin_Permission_List" />
+    from TB_ADMIN a inner join TB_ADMIN_ROLE ar on a.ADMIN_ID=ar.ADMIN_ID
+		inner join TB_ROLE_PERMISSION ra on ar.ROLE_ID=ra.ROLE_ID 
+			inner join TB_PERMISSION p on ra.PERMISSION_ID=p.PERMISSION_ID
+ 				where a.ADMIN_ID=#{adminId,jdbcType=VARCHAR} and ra.restore = 0
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from TB_PERMISSION
+    where PERMISSION_ID = #{permissionId,jdbcType=VARCHAR}
+  </delete>
+  
+  <insert id="add" parameterType="com.microservice.admin.entity.Permission">
+    insert into TB_PERMISSION
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="permissionId != null">
+        PERMISSION_ID,
+        </if>
+        <if test="permissionName != null">
+        PERMISSION_NAME,
+        </if>
+        <if test="apiUrl != null">
+        API_URL,
+        </if>
+        <if test="permissionRemark != null">
+        PERMISSION_REMARK,
+        </if>
+        <if test="postPermission != null">
+        POST_PERMISSION,
+        </if>
+        <if test="deletePermission != null">
+        DELETE_PERMISSION,
+        </if>
+        <if test="putPermission != null">
+        PUT_PERMISSION,
+        </if>
+        <if test="getPermission != null">
+        GET_PERMISSION,
+        </if>
+        <if test="menuId != null">
+        MENU_ID,
+        </if>
+        <if test="permissionIdent != null">
+        PERMISSION_IDENT,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="permissionId != null">
+        #{permissionId,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionName != null">
+        #{permissionName,jdbcType=VARCHAR},
+        </if>
+        <if test="apiUrl != null">
+        #{apiUrl,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionRemark != null">
+        #{permissionRemark,jdbcType=VARCHAR},
+        </if>
+        <if test="postPermission != null">
+        #{postPermission,jdbcType=INTEGER},
+        </if>
+        <if test="deletePermission != null">
+        #{deletePermission,jdbcType=INTEGER},
+        </if>
+        <if test="putPermission != null">
+        #{putPermission,jdbcType=INTEGER},
+        </if>
+        <if test="getPermission != null">
+        #{getPermission,jdbcType=INTEGER},
+        </if>               
+        <if test="menuId != null">
+        #{menuId,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionIdent != null">
+        #{permissionIdent,jdbcType=VARCHAR},
+        </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.microservice.admin.entity.Permission">
+    update TB_PERMISSION
+    <set>
+        <if test="permissionName != null">
+        PERMISSION_NAME = #{permissionName,jdbcType=VARCHAR},
+        </if>
+        <if test="apiUrl != null">
+        API_URL = #{apiUrl,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionRemark != null">
+        PERMISSION_REMARK = #{permissionRemark,jdbcType=VARCHAR},
+        </if>
+        <if test="postPermission != null">
+        POST_PERMISSION = #{postPermission,jdbcType=INTEGER},
+        </if>
+        <if test="deletePermission != null">
+        DELETE_PERMISSION = #{deletePermission,jdbcType=INTEGER},
+        </if>
+        <if test="putPermission != null">
+        PUT_PERMISSION = #{putPermission,jdbcType=INTEGER},
+        </if>
+        <if test="getPermission != null">
+        GET_PERMISSION = #{getPermission,jdbcType=INTEGER},
+        </if>       
+        <if test="menuId != null">
+        MENU_ID = #{menuId,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionIdent != null">
+        PERMISSION_IDENT = #{permissionIdent,jdbcType=VARCHAR},
+        </if>
+    </set>
+    where PERMISSION_ID = #{permissionId,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByMap" parameterType="java.util.Map">
+    update TB_PERMISSION
+    <set>
+        <foreach collection="params" index="key" item="value" separator=", ">
+            <if test="key != 'where'">
+            	<if test="value.toString()=='now'">
+            		${key} = sysdate
+            	</if>
+            	<if test="value.toString()!='now'">
+            		${key} = #{value}
+            	</if>
+            </if>
+        </foreach>
+    </set>
+    <where>
+        <if test="params.where==null">
+            1=0
+        </if>
+        <if test="params.where!=null">
+            <foreach collection="params.where" index="key" item="value" separator=" and ">
+            	<if test="key.indexOf('min') ==0">
+            		<if test="value.toString()=='now'">
+            			${key.substring(3)} &gt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &gt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('max') ==0">
+        			<if test="value.toString()=='now'">
+            			${key.substring(3)} &lt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &lt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('like') ==0">
+        			${key.substring(4)} like #{value}
+        		</if>
+        		<if test="key.indexOf('min') !=0 and key.indexOf('max') !=0 and key.indexOf('like') !=0">
+            		${key} = #{value}
+        		</if>
+            </foreach>
+        </if>
+    </where>
+  </update>
+ 
+  <select id="searchRequest" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+			TB_PERMISSION ${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+				from TB_PERMISSION ${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+  <select id="pageRequestMenuId" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+			TB_PERMISSION where  MENU_ID in (
+				select  MENU_ID              
+					from TB_MENU             
+					start with MENU_ID=#{data.menuId}   
+					connect by prior MENU_ID=PARENT_ID )
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+				from TB_PERMISSION where  MENU_ID in (
+				select  MENU_ID              
+					from TB_MENU             
+					start with MENU_ID=#{data.menuId}   
+					connect by prior MENU_ID=PARENT_ID )
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+	
+	<select id="countMenuId" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_PERMISSION where  MENU_ID in (
+				select  MENU_ID              
+					from TB_MENU             
+					start with MENU_ID=#{data.menuId}   
+					connect by prior MENU_ID=PARENT_ID )
+	</select>
+	<select id="count" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_PERMISSION ${where}
+	</select>
+	
+	<select id="pageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List" />
+        from(
+	        select 
+	        <include refid="Base_Column_List" />
+	        from TB_PERMISSION ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+	
+		<select id="topicCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(0) from TB_PERMISSION 
+		${where}
+	</select>
+	
+	<select id="topicPageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List" />
+        from(
+	        select 
+	        <include refid="Base_Column_List" />
+	        from TB_PERMISSION ${data}  
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+
+
+
+    <select id="getPermissionIdent" resultType="java.lang.String" parameterType="java.lang.String">
+		select PERMISSION_IDENT from TB_PERMISSION
+        <where>
+            <if test="adminId!=null">
+                PERMISSION_ID in  (select PERMISSION_ID from TB_ROLE_PERMISSION where ROLE_ID = #{adminId} and PERMISSION_ID in (select PERMISSION_ID from TB_PERMISSION WHERE MENU_ID  = #{menuId}))
+                AND PERMISSION_IDENT IS NOT NULL
+            </if>
+            <if test="adminId==null">
+                PERMISSION_ID in  (select PERMISSION_ID from TB_ROLE_PERMISSION where  PERMISSION_ID in (select PERMISSION_ID from TB_PERMISSION WHERE MENU_ID  = #{menuId}))
+                AND PERMISSION_IDENT IS NOT NULL
+            </if>
+        </where>
+	</select>
+
+    <select id="getSubClassIdent" resultType="java.lang.String" parameterType="java.lang.String">
+        select PERMISSION_IDENT from TB_PERMISSION
+        <where>
+            <if test="adminId!=null">
+                PERMISSION_ID in  (select PERMISSION_ID from TB_ROLE_PERMISSION where ROLE_ID =#{adminId} and PERMISSION_ID in (select PERMISSION_ID from TB_PERMISSION WHERE MENU_ID  in (select MENU_ID from TB_MENU where PARENT_ID =#{menuId}) ))
+                 AND PERMISSION_IDENT IS NOT NULL
+            </if>
+            <if test="adminId==null">
+                PERMISSION_ID in  (select PERMISSION_ID from TB_ROLE_PERMISSION where  PERMISSION_ID in (select PERMISSION_ID from TB_PERMISSION WHERE MENU_ID  in (select MENU_ID from TB_MENU where PARENT_ID =#{menuId})))
+                AND PERMISSION_IDENT IS NOT NULL
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getPermission" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select pe.PERMISSION_ID,pe.permission_name,pe.api_url,pe.permission_remark,pe.get_permission,pe.post_permission,pe.put_permission,pe.delete_permission,pe.menu_id,pe.permission_ident from TB_PERMISSION  pe
+        left join TB_ROLE_PERMISSION ro on ro.PERMISSION_ID=pe.PERMISSION_ID
+        <where>
+            <if test="menuId!=null">
+                AND  pe.menu_id=#{menuId}
+            </if>
+            <if test="roleId!=null">
+                AND  ro.ROLE_ID=#{roleId}
+            </if>
+        </where>
+        group by pe.PERMISSION_ID,pe.permission_name,pe.api_url,pe.permission_remark,pe.get_permission,pe.post_permission,pe.put_permission,pe.delete_permission,pe.menu_id,pe.permission_ident
+    </select>
+
+</mapper>

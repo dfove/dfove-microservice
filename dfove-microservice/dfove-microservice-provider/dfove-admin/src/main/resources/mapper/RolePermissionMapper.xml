@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.admin.mapper.RolePermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.microservice.admin.entity.RolePermission">
+        <id column="ROLE_PERMISSION_ID" property="rolePermissionId" jdbcType="VARCHAR" />
+        <result column="ROLE_ID" property="roleId" jdbcType="VARCHAR" />
+        <result column="PERMISSION_ID" property="permissionId" jdbcType="VARCHAR" />
+        <result column="POST_PERMISSION" property="postPermission" jdbcType="INTEGER" />
+        <result column="DELETE_PERMISSION" property="deletePermission" jdbcType="INTEGER" />
+        <result column="PUT_PERMISSION" property="putPermission" jdbcType="INTEGER" />
+        <result column="GET_PERMISSION" property="getPermission" jdbcType="INTEGER" />
+        <result column="RESTORE" property="restore" jdbcType="INTEGER" />
+  </resultMap>
+  
+    <resultMap id="ExtendsResultMap" type="com.microservice.admin.entity.RolePermissionExtends">
+    	<result column="ROLE_PERMISSION_ID" property="rolePermissionId" jdbcType="VARCHAR" />
+        <result column="ROLE_ID" property="roleId" jdbcType="VARCHAR" />
+        <result column="ROLE_NAME" property="roleName" jdbcType="VARCHAR" />
+        <result column="PERMISSION_ID" property="permissionId" jdbcType="VARCHAR" />
+        <result column="PERMISSION_NAME" property="permissionName" jdbcType="VARCHAR" />
+        <result column="API_URL" property="apiUrl" jdbcType="VARCHAR" />
+        <result column="POST_PERMISSION" property="postPermission" jdbcType="INTEGER" />
+        <result column="DELETE_PERMISSION" property="deletePermission" jdbcType="INTEGER" />
+        <result column="PUT_PERMISSION" property="putPermission" jdbcType="INTEGER" />
+        <result column="GET_PERMISSION" property="getPermission" jdbcType="INTEGER" />
+        <result column="RESTORE" property="restore" jdbcType="INTEGER" />
+        <result column="MENU_ID" property="menuId" jdbcType="VARCHAR" />
+        <result column="MENU_TYPE" property="menuType" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+     ROLE_PERMISSION_ID, ROLE_ID, PERMISSION_ID, POST_PERMISSION, DELETE_PERMISSION, PUT_PERMISSION, GET_PERMISSION, RESTORE
+  </sql>
+  
+  <sql id="Extends_Column_Outer" >
+      ROLE_PERMISSION_ID, ROLE_ID, ROLE_NAME, PERMISSION_ID, PERMISSION_NAME, API_URL, POST_PERMISSION, DELETE_PERMISSION, PUT_PERMISSION, GET_PERMISSION, RESTORE,MENU_ID
+  </sql>
+  
+  <sql id="Extends_Column_Inner" >
+     rp.ROLE_PERMISSION_ID, rp.ROLE_ID, r.ROLE_NAME, rp.PERMISSION_ID, p.PERMISSION_NAME, p.API_URL, 
+     rp.POST_PERMISSION, rp.DELETE_PERMISSION, rp.PUT_PERMISSION, rp.GET_PERMISSION, rp.RESTORE,p.MENU_ID,m.MENU_TYPE
+  </sql>
+  
+  <sql id="Extends_Table" >
+     TB_ROLE_PERMISSION rp 
+			inner join TB_ROLE r on rp.ROLE_ID=r.ROLE_ID
+			inner join TB_PERMISSION p on rp.PERMISSION_ID=p.PERMISSION_ID
+			inner join TB_MENU m on m.MENU_ID=p.MENU_ID
+  </sql>
+  
+  <select id="find" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_ROLE_PERMISSION
+    where ROLE_PERMISSION_ID = #{rolePermissionId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findByRoleAndPermission" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from(
+	    select ROWNUM as rn,
+	    <include refid="Base_Column_List" />
+	    from TB_ROLE_PERMISSION
+	    where ROLE_ID=#{roleId,jdbcType=VARCHAR} and PERMISSION_ID = #{permissionId,jdbcType=VARCHAR} and RESTORE = #{restore,jdbcType=INTEGER}
+    )
+    where rn =1 order by rn
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from TB_ROLE_PERMISSION
+    where ROLE_PERMISSION_ID = #{rolePermissionId,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteSuperAdmin" parameterType="com.microservice.admin.entity.RolePermission" >
+    delete from TB_ROLE_PERMISSION
+    where 1=1
+         <if test="roleId != null">
+       	and	ROLE_ID= #{roleId,jdbcType=VARCHAR}
+        </if>
+         <if test="permissionId != null">
+       	and	PERMISSION_ID=  #{permissionId,jdbcType=VARCHAR}
+        </if>
+      and RESTORE = 0
+  </delete>
+  
+  <delete id="deleteNotExists">
+    delete from TB_ROLE_PERMISSION
+    where ROLE_ID=#{roleId,jdbcType=VARCHAR}
+    	and PERMISSION_ID NOT IN
+	    <foreach collection="permissionIds" index="index" item="item" open="(" separator=", " close=")">  
+			#{item}
+		</foreach>
+      and RESTORE = #{restore,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="add" parameterType="com.microservice.admin.entity.RolePermission">
+    insert into TB_ROLE_PERMISSION
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="rolePermissionId != null">
+        ROLE_PERMISSION_ID,
+        </if>
+        <if test="roleId != null">
+        ROLE_ID,
+        </if>
+        <if test="permissionId != null">
+        PERMISSION_ID,
+        </if>
+        <if test="postPermission != null">
+        POST_PERMISSION,
+        </if>
+        <if test="deletePermission != null">
+        DELETE_PERMISSION,
+        </if>
+        <if test="putPermission != null">
+        PUT_PERMISSION,
+        </if>
+        <if test="getPermission != null">
+        GET_PERMISSION,
+        </if>
+        <if test="restore != null">
+            RESTORE,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="rolePermissionId != null">
+        #{rolePermissionId,jdbcType=VARCHAR},
+        </if>
+        <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionId != null">
+        #{permissionId,jdbcType=VARCHAR},
+        </if>
+        <if test="postPermission != null">
+        #{postPermission,jdbcType=INTEGER},
+        </if>
+        <if test="deletePermission != null">
+        #{deletePermission,jdbcType=INTEGER},
+        </if>
+        <if test="putPermission != null">
+        #{putPermission,jdbcType=INTEGER},
+        </if>
+        <if test="getPermission != null">
+        #{getPermission,jdbcType=INTEGER},
+        </if>
+        <if test="restore != null">
+        #{restore,jdbcType=INTEGER},
+        </if>
+    </trim>
+  </insert>
+  
+  <insert id="addSuperAdmin" parameterType="com.microservice.admin.entity.RolePermission">
+    insert into TB_ROLE_PERMISSION
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        ROLE_PERMISSION_ID,
+        <if test="roleId != null">
+        ROLE_ID,
+        </if>
+        <if test="permissionId != null">
+        PERMISSION_ID,
+        </if>   
+        POST_PERMISSION,
+        DELETE_PERMISSION,
+        PUT_PERMISSION,
+        GET_PERMISSION,
+        RESTORE
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        #{rolePermissionId,jdbcType=VARCHAR},
+        <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+        </if>
+        <if test="permissionId != null">
+        #{permissionId,jdbcType=VARCHAR},
+        </if>
+       	1,1,1,1,0
+    </trim>
+  </insert>
+  
+  <insert id="batchAdd">
+  	insert into TB_ROLE_PERMISSION(ROLE_PERMISSION_ID, ROLE_ID, PERMISSION_ID, POST_PERMISSION, DELETE_PERMISSION, PUT_PERMISSION, GET_PERMISSION, RESTORE)
+  	select T.ROLE_PERMISSION_ID, t.ROLE_ID, t.PERMISSION_ID, T.POST_PERMISSION, T.DELETE_PERMISSION, T.PUT_PERMISSION, T.GET_PERMISSION, T.RESTORE from
+	<foreach collection="permissions" index="index" item="item" open="(select " separator=" union select " close=")t">
+        #{item.rolePermissionId} as ROLE_PERMISSION_ID,
+        #{roleId} as ROLE_ID,
+        #{item.permissionId} as PERMISSION_ID,
+        #{item.postPermission} as POST_PERMISSION,
+        #{item.deletePermission} as DELETE_PERMISSION,
+        #{item.putPermission} as PUT_PERMISSION,
+        #{item.getPermission} as GET_PERMISSION,
+		#{item.restore} as RESTORE
+		from dual
+	</foreach>  
+	where not exists(select 1 from TB_ROLE_PERMISSION p where t.ROLE_ID=p.ROLE_ID and t.PERMISSION_ID=p.PERMISSION_ID and t.RESTORE=p.RESTORE)
+  </insert>
+  
+  <update id="update" parameterType="com.microservice.admin.entity.RolePermission">
+    update TB_ROLE_PERMISSION
+    <set>
+        <if test="postPermission != null">
+        POST_PERMISSION = #{postPermission,jdbcType=INTEGER},
+        </if>
+        <if test="deletePermission != null">
+        DELETE_PERMISSION = #{deletePermission,jdbcType=INTEGER},
+        </if>
+        <if test="putPermission != null">
+        PUT_PERMISSION = #{putPermission,jdbcType=INTEGER},
+        </if>
+        <if test="getPermission != null">
+        GET_PERMISSION = #{getPermission,jdbcType=INTEGER},
+        </if>
+        <if test="restore != null">
+            RESTORE = #{restore,jdbcType=INTEGER},
+        </if>
+    </set>
+    where ROLE_PERMISSION_ID = #{rolePermissionId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateRoleId" parameterType="com.microservice.admin.entity.RolePermission">
+    update TB_ROLE_PERMISSION
+    <set>
+        <if test="postPermission != null">
+        POST_PERMISSION = #{postPermission,jdbcType=INTEGER},
+        </if>
+        <if test="deletePermission != null">
+        DELETE_PERMISSION = #{deletePermission,jdbcType=INTEGER},
+        </if>
+        <if test="putPermission != null">
+        PUT_PERMISSION = #{putPermission,jdbcType=INTEGER},
+        </if>
+        <if test="getPermission != null">
+        GET_PERMISSION = #{getPermission,jdbcType=INTEGER},
+        </if>
+    </set>
+    where PERMISSION_ID = #{permissionId,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="batchUpdate">
+  	update TB_ROLE_PERMISSION a SET (a.POST_PERMISSION, a.DELETE_PERMISSION, a.PUT_PERMISSION, a.GET_PERMISSION) 
+  		=(select t.POST_PERMISSION, t.DELETE_PERMISSION, t.PUT_PERMISSION, t.GET_PERMISSION from
+	<foreach collection="permissions" index="index" item="item" open="(select " separator=" union select " close=")t">
+		#{roleId} as ROLE_ID, #{item.permissionId} as PERMISSION_ID,
+        #{item.postPermission} as POST_PERMISSION,
+        #{item.deletePermission} as DELETE_PERMISSION,
+        #{item.putPermission} as PUT_PERMISSION,
+        #{item.getPermission} as GET_PERMISSION,
+		#{item.restore} as RESTORE from dual
+	</foreach>  
+	where a.ROLE_ID=t.ROLE_ID and a.PERMISSION_ID=t.PERMISSION_ID and a.RESTORE = t.RESTORE)
+	where exists(select '1' from
+		<foreach collection="permissions" index="index" item="item" open="(select " separator=" union select " close=")t">
+            #{roleId} as ROLE_ID,#{item.permissionId} as PERMISSION_ID, #{item.restore} as RESTORE from dual
+		</foreach>
+		where a.ROLE_ID=t.ROLE_ID and a.PERMISSION_ID=t.PERMISSION_ID and a.RESTORE = t.RESTORE)
+  </update>
+  
+  <update id="updateByMap" parameterType="java.util.Map">
+    update TB_ROLE_PERMISSION
+    <set>
+        <foreach collection="params" index="key" item="value" separator=", ">
+            <if test="key != 'where'">
+            	<if test="value.toString()=='now'">
+            		${key} = sysdate
+            	</if>
+            	<if test="value.toString()!='now'">
+            		${key} = #{value}
+            	</if>
+            </if>
+        </foreach>
+    </set>
+    <where>
+        <if test="params.where==null">
+            1=0
+        </if>
+        <if test="params.where!=null">
+            <foreach collection="params.where" index="key" item="value" separator=" and ">
+            	<if test="key.indexOf('min') ==0">
+            		<if test="value.toString()=='now'">
+            			${key.substring(3)} &gt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &gt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('max') ==0">
+        			<if test="value.toString()=='now'">
+            			${key.substring(3)} &lt; sysdate
+	            	</if>
+	            	<if test="value.toString()!='now'">
+	            		${key.substring(3)} &lt; #{value}
+	            	</if>
+        		</if>
+        		<if test="key.indexOf('like') ==0">
+        			${key.substring(4)} like #{value}
+        		</if>
+        		<if test="key.indexOf('min') !=0 and key.indexOf('max') !=0 and key.indexOf('like') !=0">
+            		${key} = #{value}
+        		</if>
+            </foreach>
+        </if>
+    </where>
+  </update>
+ 
+  <select id="searchRequest" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+			TB_ROLE_PERMISSION ${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+				from TB_ROLE_PERMISSION ${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+	
+	<select id="count" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_ROLE_PERMISSION ${where}
+	</select>
+	
+	<select id="pageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List" />
+        from(
+	        select 
+	        <include refid="Base_Column_List" />
+	        from TB_ROLE_PERMISSION ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+	
+	<select id="searchRequestExtends" resultMap="ExtendsResultMap" parameterType="common.search.entity.SearchRequest">
+        <if test='pageSize ==null or pageSize ==0'>
+	        select
+			<include refid="Extends_Column_Inner" />
+			from
+			<include refid="Extends_Table" />
+			${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+        	select
+			<include refid="Extends_Column_Outer" />
+			from
+			(select ROWNUM as rn, 
+			<include refid="Extends_Column_Outer" />
+			from (
+				select 
+				<include refid="Extends_Column_Inner" />
+				from
+	 			<include refid="Extends_Table" />
+	 			${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				) t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+	
+	<select id="countExtends" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from 
+		<include refid="Extends_Table" />
+		${where}
+	</select>
+	
+	<select id="pageRequestExtends" resultMap="ExtendsResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Extends_Column_Outer" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Extends_Column_Outer" />
+        from (
+        	select 
+        	<include refid="Extends_Column_Inner" />
+        	from
+	        <include refid="Extends_Table" />
+	        ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+
+    <delete id="deleteByRoleId">
+    	delete from TB_ROLE_PERMISSION
+    	where ROLE_ID = #{roleId,jdbcType=VARCHAR} and RESTORE = #{restore,jdbcType=INTEGER}
+  	</delete>
+
+</mapper>

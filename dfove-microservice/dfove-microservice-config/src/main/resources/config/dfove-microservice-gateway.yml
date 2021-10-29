@@ -1,0 +1,112 @@
+#begin
+ 
+#服务注册
+eureka:
+  client: 
+    healthcheck: 
+      enabled: true
+#熔断
+feign:
+  hystrix:
+    enabled: true 
+    
+spring: 
+  cloud:
+    gateway:
+      discovery: 
+        locator: 
+          enabled: true
+          lowerCaseServiceId: true
+      routes: 
+      #配置中心
+      - id: dfove-microservice-config
+        uri: lb://dfove-microservice-config
+        predicates:
+        - Path=/config/**
+        filters:
+        - StripPrefix=1
+      #鉴权中心
+      - id: dfove-microservice-authorization
+        uri: lb://dfove-microservice-authorization
+        predicates:
+        - Path=/authorization/**
+        filters:
+        - StripPrefix=1 
+      #管理员 
+      - id: dfove-admin
+        uri: lb://dfove-admin
+        predicates:
+        - Path=/admin/**
+        filters:
+        - StripPrefix=1
+      #websocket服务
+      - id: dfove-websocket
+        uri: lb:ws://jnyc-websocket
+        predicates:
+        - Path=/websocket/**
+        filters:
+        - StripPrefix=1
+       #datacleaning
+      - id: dfove-datacleaning
+        uri: lb://dfove-datacleaning
+        predicates:
+        - Path=/datacleaning/**
+        filters:
+        - StripPrefix=1
+      #jnyc-filestorage
+      - id: dfove-filestorage
+        uri: lb://dfove-filestorage
+        predicates:
+        - Path=/filestorage/**
+        filters:
+        - StripPrefix=1
+       #log
+      - id: dfove-log
+        uri: lb://dfove-log
+        predicates:
+        - Path=/log/**
+        filters:
+        - StripPrefix=1
+#基础服务v1，即信服务v11, 聚合服务v2
+gateways:
+  authorization: http://dfove-microservice-authorization/dfove/v1
+  map: 
+    #完全匿名
+    none:
+    - url: /dfove/v1/validcode
+      methods: get  
+    - url: /dfove/v1/picture/code
+      methods: get;post
+    - url: /dfove/v1/sms/valid/code
+      methods: post
+    - url: /dfove/v1/anonymous
+      methods: get;post
+    - url: /dfove/v1/login
+      methods: get,post
+    - url: /dfove/v1/login/refreshold
+      methods: get,post
+    - url: /dfove/v1/login/verificationcode
+      methods: get,post
+    - url: /dfove/v1/login/phonelogin
+      methods: get,post
+    - url: /dfove/v1/app/version
+      methods: get,post
+    - url: /dfove/v1/login/wxlogin
+      methods: get,post
+    - url: /dfove/v1/import(/\w*)*
+      methods: get,post
+    - url: /dfove/v1/admin
+      methods: get,post     
+    - url: /dfove/v1/files/download/file
+      methods: get    
+   #管理员token 
+    admin: 
+    - url: /dfove/v(\d+)(/\w*)*
+      methods: get;post;put;delete
+    - url: /endpoint(/\d+)?(/)?$
+      methods: get
+       
+#允许跨域
+cross-domain: 
+  enable: true
+#end

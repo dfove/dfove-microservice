@@ -1,0 +1,44 @@
+#fastDFS工具类使用说明。
+
+##参考com.microservice.fastdfs.demo.包下案例##
+
+//第一步：在microservice-XXX-X.yml 配置fastDFS
+#fastdfs-config
+fdfs:
+  so-timeout: 1500
+  connect-timeout: 600 
+  thumb-image:
+    width: 200
+    height: 200
+  tracker-list:
+    - 192.168.1.231:22122
+  pool:
+     max-total: 150 
+     max-wait-millis: 100
+
+//第二步：获取fastDFS配置参数
+@Value("${fdfs.tracker-list[0]}")
+private String tracker_servers;
+private String connect_timeout_in_seconds="30";
+private String network_timeout_in_seconds="60";
+private String charset="UTF-8";
+private String http_anti_steal_token="no";
+private String http_secret_key="zgr888";
+private String http_tracker_http_port="9990";
+
+//第三步：初始化fastdfs工具类配置参数
+private void initByProperties() {
+	Properties prop = new Properties();
+	prop.setProperty("fastdfs.connect_timeout_in_seconds",this.connect_timeout_in_seconds);
+	prop.setProperty("fastdfs.network_timeout_in_seconds", this.network_timeout_in_seconds);
+	prop.setProperty("fastdfs.charset", this.charset);
+	prop.setProperty("fastdfs.http_anti_steal_token", this.http_anti_steal_token);
+	prop.setProperty("fastdfs.http_secret_key", this.http_secret_key);
+	prop.setProperty("fastdfs.http_tracker_http_port",this.http_tracker_http_port);
+	prop.setProperty("fastdfs.tracker_servers",this.tracker_servers);
+	//初始化fastdfs工具类配置参数
+	FastdfsUtil.initByProperties(prop);
+}
+
+
+

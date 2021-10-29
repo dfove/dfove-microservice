@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.fastdfs.mapper.DataCleaningMapper">
+	<resultMap id="BaseResultMap" type="com.microservice.fastdfs.entity.FastdfsEntity">
+		<id column="ID" property="id" jdbcType="INTEGER" />
+		<result column="ORIGINAL_FILE_NAME" jdbcType="VARCHAR" property="originalFileName" />
+		<result column="FILE_NAME" jdbcType="VARCHAR" property="fileName" />
+		<result column="CONTENT_TYPE" jdbcType="VARCHAR" property="contentType" />
+		<result column="EXT" jdbcType="VARCHAR" property="ext" />
+		<result column="FILE_SIZE" jdbcType="DECIMAL" property="fileSize" />
+		<result column="GROUP1" jdbcType="VARCHAR" property="group1" />
+		<result column="FULL_PATH" jdbcType="VARCHAR" property="fullPath" />
+		<result column="PATH" jdbcType="VARCHAR" property="path" />
+		<result column="STATE" jdbcType="VARCHAR" property="state" />
+		<result column="MESSAGE" jdbcType="VARCHAR" property="message" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		LOG_ID, MONITOR_ID, TYPE, MESSAGE, LOG_TIME
+	</sql>
+
+	<select id="keyList" resultType="java.lang.String"><!-- resultMap="BaseResultMap" -->
+		select
+		<!-- <include refid="Base_Column_List" /> -->
+		${keycolumn}
+		from ${table}
+		where ${keycolumn} in (
+		<foreach collection="keys" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</select>
+
+	<!-- 寄递清洗入库 -->
+	<insert id="addCasepersonExpress" useGeneratedKeys="false" parameterType="java.util.Map">
+
+
+		insert into TB_CASEPERSON_EXPRESS
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID,
+			UUID,
+			NAME,
+			SFZH,
+			ADDRESS,
+			REMARK,
+			ORDERID,
+			ACCEPT_TIME,
+			SENDER_NAME,
+			SENDER_MOBILE,
+			SENDER_PROVINCE,
+			SENDER_CITY,
+			SENDER_COUNTRY,
+			SENDER_ADDRESS,
+			RECEIVER_NAME,
+			RECEIVER_MOBILE,
+			RECEIVER_PROVINCE,
+			RECEIVER_CITY,
+			RECEIVER_COUNTRY,
+			RECEIVER_ADDRESS,
+			ITEM_NAME,
+			ITEM_TYPE,
+			ITEM_QUANTITY,
+			ITEM_VALUE,
+			TOTAL_WEIGHT,
+			TOTAL_SIZE,
+			ITEM_REMARK,
+			DATA_SOUCE,
+			CATE_GORY,
+			
+			COMPANY,
+			CASE_AMOUNT,
+			CASE_NUMBER,
+			FIND_TIME,
+			CENSOR_NAME,
+			ORGANIZATION_NAME,
+			ORGANIZATION_ID,
+			IS_COLLECTION
+		</trim>
+		SELECT TB_CASEPERSON_EXPRESS_SEQ.nextval as ID,A.* from
+		(
+		<foreach collection="list" item="item" index="index" separator="UNION ALL">
+			select
+			#{item.uuid,jdbcType=VARCHAR} as UUID,
+			#{item.name,jdbcType=VARCHAR} as NAME,
+			#{item.sfzh,jdbcType=VARCHAR} as SFZH,
+			#{item.address,jdbcType=VARCHAR} as ADDRESS,
+			#{item.remark,jdbcType=VARCHAR} as REMARK,
+			#{item.orderid,jdbcType=VARCHAR} as ORDERID,
+			#{item.acceptTime,jdbcType=DATE} as ACCEPT_TIME,
+			#{item.senderName,jdbcType=VARCHAR} as SENDER_NAME,
+			#{item.senderMobile,jdbcType=VARCHAR} as SENDER_MOBILE,
+			#{item.senderProvince,jdbcType=VARCHAR} as SENDER_PROVINCE,
+			#{item.senderCity,jdbcType=VARCHAR} as SENDER_CITY,
+			#{item.senderCountry,jdbcType=VARCHAR} as SENDER_COUNTRY,
+			#{item.senderAddress,jdbcType=VARCHAR} as SENDER_ADDRESS,
+			#{item.receiverName,jdbcType=VARCHAR} as RECEIVER_NAME,
+			#{item.receiverMobile,jdbcType=VARCHAR} as RECEIVER_MOBILE,
+			#{item.receiverProvince,jdbcType=VARCHAR} as RECEIVER_PROVINCE,
+			#{item.receiverCity,jdbcType=VARCHAR} as RECEIVER_CITY,
+			#{item.receiverCountry,jdbcType=VARCHAR} as RECEIVER_COUNTRY,
+			#{item.receiverAddress,jdbcType=VARCHAR} as RECEIVER_ADDRESS,
+			#{item.itemName,jdbcType=VARCHAR} as ITEM_NAME,
+			#{item.itemType,jdbcType=DECIMAL} as ITEM_TYPE,
+			#{item.itemQeantity,jdbcType=DECIMAL} as ITEM_QUANTITY,
+			#{item.itemValue,jdbcType=DECIMAL} as ITEM_VALUE,
+			#{item.totalWeight,jdbcType=DECIMAL} as TOTAL_WEIGHT,
+			#{item.totalSize,jdbcType=DECIMAL} as TOTAL_SIZE,
+			#{item.itemRemark,jdbcType=VARCHAR} as ITEM_REMARK,
+			#{item.data_Souce,jdbcType=VARCHAR} as DATA_SOUCE,
+			#{item.cate_Gory,jdbcType=VARCHAR} as CATE_GORY,
+			
+			#{item.company,jdbcType=VARCHAR} as COMPANY,
+			#{item.caseAmount,jdbcType=VARCHAR} as CASE_AMOUNT,
+			#{item.caseNumber,jdbcType=VARCHAR} as CASE_NUMBER,
+			#{item.findTime,jdbcType=VARCHAR} as FIND_TIME,
+			#{item.censorName,jdbcType=VARCHAR} as CENSOR_NAME,
+			#{item.organizationName,jdbcType=VARCHAR} as ORGANIZATION_NAME,
+			#{item.organizationId,jdbcType=VARCHAR} as ORGANIZATION_ID,
+			#{item.isCollection,jdbcType=VARCHAR} as IS_COLLECTION
+			
+		<!-- 	,#{id,jdbcType=INTEGER} as ID -->
+			from dual
+		</foreach>
+		) A
+	</insert>
+	<!-- 行为 -->
+	<insert id="addBehavior" useGeneratedKeys="false" parameterType="java.util.Map">
+
+
+		insert into TB_CASEPERSON_BEHAVIOR
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID,
+			CASEPERSON_ID,
+			CASEPERSO_NNAME,
+			CASE_ADDRESS,
+			START_TIME,
+			END_TIME,
+			CASE_TYPE,
+			CASE_DESCRIPTION,
+			CASE_DETAILSID,
+
+		</trim>
+		SELECT TB_CASEPERSON_BEHAVIOR_SEQ.nextval as ID, A.* from 
+		(
+		<foreach collection="list" item="item" index="index" separator="UNION ALL">
+			select
+		<!-- 	#{id,jdbcType=INTEGER} as ID, -->
+			#{item.casepersonId,jdbcType=VARCHAR} as CASEPERSON_ID,
+			#{item.casepersonName,jdbcType=VARCHAR} as CASEPERSO_NNAME,
+			#{item.caseAddress,jdbcType=VARCHAR} as CASE_ADDRESS,
+			#{item.startTime,jdbcType=DATE} as START_TIME,
+			#{item.endTime,jdbcType=DATE} as END_TIME,
+			#{item.caseType,jdbcType=VARCHAR} as CASE_TYPE,
+			#{item.caseDescription,jdbcType=VARCHAR} as CASE_DESCRIPTION,
+			#{item.caseDetailsid,jdbcType=VARCHAR} as CASE_DETAILSID
+
+			from dual
+		</foreach>
+		) A
+	</insert>
+
+	<!-- 关系 -->
+	<insert id="addRelation" useGeneratedKeys="false" parameterType="java.util.Map">
+		insert into TB_CASEPERSON_RELATION
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID,
+			CASEPERSON_ID,
+			CASEPERSON_NAME,
+			SENDER_MOBILE,
+			RECEIVER_ID,
+			RECEIVER_NAME,
+			RECEIVER_MOBILE,
+			RELATION_NAME,
+			DETAILED_ID
+
+		</trim>
+		SELECT TB_CASEPERSON_RELATION_SEQ.nextval as ID,A.* from 
+		(
+		<foreach collection="list" item="item" index="index" separator="UNION ALL">
+			select
+		<!-- 	#{id,jdbcType=INTEGER} as ID, -->
+			#{item.casepersonId,jdbcType=VARCHAR} as CASEPERSON_ID,
+			#{item.casepersonName,jdbcType=VARCHAR} as CASEPERSON_NAME,
+			#{item.senderMobile,jdbcType=VARCHAR} as SENDER_MOBILE,
+			#{item.receiverId,jdbcType=VARCHAR} as RECEIVER_ID,
+			#{item.receiverName,jdbcType=VARCHAR} as RECEIVER_NAME,
+			#{item.receiverMobile,jdbcType=VARCHAR} as RECEIVER_MOBILE,
+			#{item.relationName,jdbcType=VARCHAR} as RELATION_NAME,
+			#{item.detailedId,jdbcType=VARCHAR} as DETAILED_ID
+			from dual
+		</foreach>
+		) A
+	</insert>
+
+</mapper>

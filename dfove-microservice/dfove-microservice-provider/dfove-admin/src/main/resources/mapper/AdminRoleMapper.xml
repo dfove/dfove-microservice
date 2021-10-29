@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.microservice.admin.mapper.AdminRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.microservice.admin.entity.AdminRole">
+        <id column="ADMIN_ROLE_ID" property="adminRoleId" jdbcType="BIGINT" />
+        <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ROLE_ID" property="roleId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <resultMap id="ExtendsResultMap" type="com.microservice.admin.entity.AdminRoleExtends">
+        <result column="ADMIN_ROLE_ID" property="adminRoleId" jdbcType="VARCHAR" />
+        <result column="ADMIN_ID" property="adminId" jdbcType="VARCHAR" />
+        <result column="ADMIN_NAME" property="adminName" jdbcType="VARCHAR" />
+        <result column="REAL_NAME" property="realName" jdbcType="VARCHAR" />
+        <result column="ROLE_ID" property="roleId" jdbcType="VARCHAR" />
+        <result column="ROLE_NAME" property="roleName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+     ADMIN_ROLE_ID, ADMIN_ID, ROLE_ID
+  </sql>
+  
+  <sql id="Extends_Column_Outer" >
+     ADMIN_ROLE_ID, ADMIN_ID, ADMIN_NAME, REAL_NAME, ROLE_ID, ROLE_NAME
+  </sql>
+  
+  <sql id="Extends_Column_Inner" >
+     ar.ADMIN_ROLE_ID, ar.ADMIN_ID, a.ADMIN_NAME, a.REAL_NAME, ar.ROLE_ID, r.ROLE_NAME
+  </sql>
+  
+  <sql id="Extends_Table" >
+     TB_ADMIN_ROLE ar 
+			inner join TB_ADMIN a on ar.ADMIN_ID=a.ADMIN_ID
+			inner join TB_ROLE r on ar.ROLE_ID=r.ROLE_ID
+  </sql>
+  
+  <select id="find" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from TB_ADMIN_ROLE
+    where ADMIN_ROLE_ID = #{adminRoleId,jdbcType=BIGINT}
+  </select>
+ 
+ <select id="findByAdminAndRole" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from(
+	    select ROWNUM as rn,
+	    <include refid="Base_Column_List" />
+	    from TB_ADMIN_ROLE
+	    where ADMIN_ID = #{adminId,jdbcType=VARCHAR} and ROLE_ID=#{roleId,jdbcType=BIGINT}
+    )
+    where rn =1 order by rn
+  </select>
+  
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from TB_ADMIN_ROLE
+    where ADMIN_ROLE_ID = #{adminRoleId,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteAdminAndRole" parameterType="com.microservice.admin.entity.AdminRole" >
+    delete from TB_ADMIN_ROLE
+    where ADMIN_ID = #{adminId,jdbcType=VARCHAR} and ROLE_ID = #{roleId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteNotExists">
+    delete from TB_ADMIN_ROLE
+    where ADMIN_ID=#{adminId,jdbcType=VARCHAR}
+    	and ROLE_ID NOT IN
+	    <foreach collection="roleIds" index="index" item="item" open="(" separator=", " close=")">  
+			${item}  
+		</foreach>  
+  </delete>
+  
+  <insert id="add" parameterType="com.microservice.admin.entity.AdminRole">
+    insert into TB_ADMIN_ROLE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="adminRoleId != null">
+        ADMIN_ROLE_ID,
+        </if>
+        <if test="adminId != null">
+        ADMIN_ID,
+        </if>
+        <if test="roleId != null">
+        ROLE_ID,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="adminRoleId != null">
+        #{adminRoleId,jdbcType=VARCHAR},
+        </if>
+        <if test="adminId != null">
+        #{adminId,jdbcType=VARCHAR},
+        </if>
+        <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+        </if>
+    </trim>
+  </insert>
+  
+  <insert id="batchAdd">
+  	insert into TB_ADMIN_ROLE(ADMIN_ROLE_ID, ADMIN_ID, ROLE_ID) 
+  	select TB_ADMIN_ROLE_SEQ.nextval as ADMIN_ROLE_ID, t.ADMIN_ID, t.ROLE_ID from
+	<foreach collection="roleIds" index="index" item="item" open="(select " separator=" union select " close=")t">  
+		${adminId} as ADMIN_ID, ${item} as ROLE_ID from dual
+	</foreach>  
+	where not exists(select 1 from TB_ADMIN_ROLE r where t.ADMIN_ID=r.ADMIN_ID and t.ROLE_ID=r.ROLE_ID)
+  </insert>
+  
+  <select id="searchRequest" resultMap="BaseResultMap" parameterType="common.search.entity.SearchRequest">
+		select
+		<include refid="Base_Column_List" />
+		from
+        
+        <if test='pageSize ==null or pageSize ==0'>
+			TB_ADMIN_ROLE ${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+			(select ROWNUM as rn, 
+			<include refid="Base_Column_List" />
+			from(
+				select 
+				<include refid="Base_Column_List" />
+				from TB_ADMIN_ROLE ${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+	
+	<select id="count" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from TB_ADMIN_ROLE ${where}
+	</select>
+	
+	<select id="pageRequest" resultMap="BaseResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Base_Column_List" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Base_Column_List" />
+        from(
+	        select 
+	        <include refid="Base_Column_List" />
+	        from TB_ADMIN_ROLE ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			)t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+	
+	<select id="searchRequestExtends" resultMap="ExtendsResultMap" parameterType="common.search.entity.SearchRequest">
+        <if test='pageSize ==null or pageSize ==0'>
+	        select
+			<include refid="Extends_Column_Inner" />
+			from
+			<include refid="Extends_Table" />
+			${where} 
+	        <if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+		</if>
+        
+        <if test='pageSize !=null and pageSize>0'>
+        	select
+			<include refid="Extends_Column_Outer" />
+			from
+			(select ROWNUM as rn, 
+			<include refid="Extends_Column_Outer" />
+			from(
+				select 
+				<include refid="Extends_Column_Inner" />
+				from 
+	 			<include refid="Extends_Table" />
+	 			${where}
+				<if test='orderBy !=null and orderBy !=""'>
+					order by ${orderBy}
+				</if>
+				)t1 order by rn
+			)t2 where rn between 1 and ${pageSize} 
+		</if>
+	</select>
+	
+	<select id="countExtends" resultType="java.lang.Integer" parameterType="common.search.entity.SearchRequest">
+		select count(0) from 
+		<include refid="Extends_Table" />
+		${where}
+	</select>
+	
+	<select id="pageRequestExtends" resultMap="ExtendsResultMap" parameterType="common.search.entity.PageRequest">
+		select
+		<include refid="Extends_Column_Outer" />
+		from(
+		select ROWNUM as rn,
+        <include refid="Extends_Column_Outer" />
+        from(
+        	select
+        	<include refid="Extends_Column_Inner" />
+        	from
+	        <include refid="Extends_Table" />
+	        ${where} 
+			<if test='orderBy !=null and orderBy !=""'>
+				order by ${orderBy}
+			</if>
+			) t1 order by rn
+		)t2 where rn between ${indexFrom+1} and (${indexFrom}+${pageSize})
+	</select>
+
+	<delete id="deleteByRoleId" parameterType="java.lang.String">
+		delete from TB_ADMIN_ROLE
+		where ROLE_ID = #{roleId,jdbcType=BIGINT}
+	</delete>
+
+	<select id="findByAdminId" resultType="java.lang.String" parameterType="java.lang.String">
+		select ROLE_ID from  TB_ADMIN_ROLE
+		<where>
+			<if test="adminId!=null">
+				and ADMIN_ID=#{adminId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

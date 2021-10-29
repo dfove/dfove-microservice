@@ -1,0 +1,104 @@
+#begin
+
+server:
+  port: 60001
+
+spring: 
+ #配置数据源
+  datasource: 
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521:orcl
+    userName: df
+    password: df
+    max-idle: 30
+    max-wait: 30000
+    min-idle: 5
+    initial-size: 5
+
+#MyBatis的配置，主要是开启数据库中的字段名与实体对象属性的驼峰转换
+mybatis:
+  configuration: 
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 30
+    default-fetch-size: 100
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: 
+  - classpath:mapper/*.xml
+  type-aliases-package: com.microservice.admin.entity  
+    
+#打印sql
+logging:
+  level: 
+    com.microservice.admin.mapper: DEBUG
+
+#服务注册
+eureka:
+  client: 
+    healthcheck: 
+      enabled: true
+
+
+microservices: 
+  restTimeout: 20000
+  map: 
+    gateway: 
+      gateway: http://localhost:8800
+      intranet: http://localhost:8800
+      eureka: http://dfove-microservice-gateway
+    authorization: 
+      gateway: /authorization
+      intranet: http://localhost:8700
+      eureka: http://dfove-microservice-authorization
+    log:
+      gateway: /log
+      intranet: http://localhost:10131
+      eureka: http://dfove-log
+      
+topic-search:
+  map: 
+    TB_PERMISSION: 
+      keyword: API_URL,PERMISSION_NAME
+      time: ACCEPT_TIME
+    TB_RETAIL_RESELL: 
+      keyword: NAME,USERNUM,SFZH,ADDRESS,SENDER_ADDRESS,SENDER_ADDRESS
+      time: FIRST_DATE,LAST_DATE 
+    TB_CASEPERSON_FAKE: 
+      keyword: NAME,SFZH,USER_NUMBER,RELATE_USERNUM
+      time: FIRST_DATE,LAST_DATE   
+    TB_CASEPERSON_SMSAD: 
+      keyword: KEYWORD,USERNUM,RELATE_NUM,TRADE_ACCOUNT
+      time: FIRST_DATE,LAST_DATE  
+    TB_CASEPERSON_WEBSEARCH: 
+      keyword: KEYWORD,USER_NUMBER,RELATE_USERNUMBER,TRADE_ACCOUNT
+      time: FIRST_DATE,LAST_DATE    
+    TB_CASE: 
+      keyword: CASE_NAME,CASE_CODE,CAUSE_OF_ACTION,PARTY,CO_PARTY,REG_DOC_NO,UNDERTAKER,FILE_NO
+      time: CASE_DATE  
+    TB_RETAIL: 
+      keyword: COMPANY_NAME,MANAGER_NAME,BUSINESS_ADDR,LICENCE_NUMBER,SUPPLY_COMPANY,RETAIL_CID_NO,RETAIL_CID_ADDRESS,CONTRACT_PERSON,RETAIL_TEL
+      time: ISSUE_DATE
+    TB_CASEPERSON: 
+      keyword: NAME_ORG,NICKNAME,ID_CARD,ID_CARD_ADDRESS,BUSI_ADDRESS,PHONE,QQ_NO,EMAIL,BUSI_LICE_NO,PIC_PERSON,PIC_ID_CARD,LIC_NO
+      time: LST_MODI_TIME  
+    TB_CASEGOODS: 
+      keyword: GOODS_NAME
+      time: LST_MODI_TIME
+    TB_EXPRESSAREA: 
+      keyword: ADDRESS
+      time: UPDATE_TIME
+    TB_EXPRESSPOINT: 
+      keyword: ADDRESS,QJ_PHONE,CJ_PHONE,TS_PHONE
+      time: UPDATE_TIME
+    TB_EXPRESSRIDER:
+      keyword: NAME,NICKNAME,ALIAS,ID_CARD,BUSI_ADDRESS,PHONE,WECHAT_ID,QQ_NO,EMAIL,COMPANY
+      time: UPDATE_TIME
+    TB_JARGON:    
+      keyword: KEYWORD
+      time: UPDATE_TIME    
+       
+      
+#swagger
+swagger:
+  enable: true
+      
+#end  

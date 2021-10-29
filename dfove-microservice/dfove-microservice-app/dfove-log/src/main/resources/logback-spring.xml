@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+    <springProperty scope="context" name="app_name" source="spring.application.name" defaultValue="xxx"/>
+    <!--    <springProperty scope="context" name="logstash.ip" source="logstash.ip" defaultValue="xxx" />-->
+    <!--    <springProperty scope="context" name="logstash.port" source="logstash.port" defaultValue="xxx" />-->
+    <property name="log.time" value="%d{yyyy-MM-dd HH:mm:ss.SSS}"/>
+    <!--日志文件的保存路径,首先查找系统属性-Dlog.dir,如果存在就使用其；否则，在当前目录下创建名为logs目录做日志存放的目录 -->
+    <property name="log_home" value="${log.dir:-logs}/${app_name}"/>
+    <property name="warn_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg %n"/>
+    <property name="error_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg %n"/>
+
+    <springProfile name="default">
+        <property name="logstash.ip" value="localhost"/>
+        <property name="logstash.port" value="5600"/>
+    </springProfile>
+    <springProfile name="test">
+        <property name="logstash.ip" value="192.168.31.8"/>
+        <property name="logstash.port" value="5600"/>
+    </springProfile>
+    <springProfile name="pro">
+        <property name="logstash.ip" value="172.16.0.2"/>
+        <property name="logstash.port" value="5600"/>
+    </springProfile>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS}|%t|%highlight(%-5level)|%green(%X{threadId})|%cyan(%C{0}#%M:%L)|%msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${logstash.ip}:${logstash.port}</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!--                <timestamp>-->
+                <!--                    <timeZone>UTC</timeZone>-->
+                <!--                </timestamp>-->
+                <!--                <mdc/>-->
+                <!--                <context/>-->
+                <!--                <version/>-->
+                <!--                <loggerName/>-->
+                <!--                <message/>-->
+                <logLevel/>
+                <arguments/>
+                <logstashMarkers/>
+                <!--                <threadName/>-->
+                <!--                <stackTrace/>-->
+                <!--                <pattern>-->
+                <!--                    <pattern>-->
+                <!--                        {-->
+                <!--                        "logTime": "${log.time}"-->
+                <!--                        }-->
+                <!--                    </pattern>-->
+                <!--                </pattern>-->
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- 信息输出到文件 -->
+    <appender name="warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/info/%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${warn_pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <!-- 错误输出到文件 -->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/error/%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${error_pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <logger name="com.microservice.log.service.LogstashLoggerService" level="debug">
+        <appender-ref ref="LOGSTASH"/>
+    </logger>
+
+    <root level="warn">
+<!--        <appender-ref ref="STDOUT"/>-->
+        <appender-ref ref="warn"/>
+        <appender-ref ref="error"/>
+    </root>
+
+</configuration>
